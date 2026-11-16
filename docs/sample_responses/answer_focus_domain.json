@@ -1,0 +1,43 @@
+{
+  "request_id": "6ea3f20b04f14de0",
+  "type": "answer",
+  "domain": "labour",
+  "coverage": "focus",
+  "answer": {
+    "summary": "إليك ما ينص عليه القانون.",
+    "sections": {
+      "rights": [
+        {
+          "text": "يحق لـ خالد إجازة سنوية مدتها 14 يوماً",
+          "citation": {
+            "article_id": "L1",
+            "quote": "إجازة سنوية بأجر كامل مدتها أربعة عشر يوماً",
+            "label": "قانون تجريبي للعمل، المادة 61"
+          }
+        }
+      ],
+      "obligations": [],
+      "steps": [],
+      "conditions": []
+    },
+    "caveats": [],
+    "partial": false,
+    "amendment_warning": false
+  },
+  "clarifying_question": null,
+  "referral": null,
+  "message": null,
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "retrieve": 0,
+    "generate": 0,
+    "verify": 0,
+    "total": 0
+  },
+  "_note": "Sample generated from test fixtures (invented law text). Shape is the contract; content is illustrative."
+}

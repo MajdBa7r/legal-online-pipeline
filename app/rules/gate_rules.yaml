@@ -1,0 +1,28 @@
+# Decision gate rules (stage 3). Owned by the legal members; the Core System team only reads it.
+# Keywords are matched on the normalized masked question (diacritics removed, letter forms unified).
+
+# Any of these in the question -> lawyer referral. Starter list, to be reviewed.
+referral_keywords:
+  - توقيف
+  - موقوف
+  - قضية جزائية
+  - جناية
+  - جنحة
+  - مخفر
+  - مدعي عام
+  - حكم غيابي
+  - موعد المحكمة
+  - جلسة المحكمة
+  - استئناف
+  - تمييز
+  - حجز تحفظي
+  - تنفيذ قضائي
+
+# risk_level values from the understanding model that go straight to a lawyer.
+referral_risk_levels: [high]
+
+# If the understanding model marks a missing fact as blocking, ask one clarifying question.
+clarify_on_blocking_missing_fact: true
+
+# Below this domain confidence a focus-domain label is treated as "other" (search path).
+min_domain_confidence: 0.6

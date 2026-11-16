@@ -1,0 +1,23 @@
+{
+  "request_id": "680751ad0005460f",
+  "type": "no_support",
+  "domain": "labour",
+  "coverage": null,
+  "answer": null,
+  "clarifying_question": null,
+  "referral": null,
+  "message": "لم نجد نصاً واضحاً في التشريعات الأردنية النافذة يجيب عن سؤالك بشكل مباشر. ننصحك بمراجعة محامٍ أو الجهة المختصة.",
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "retrieve": 0,
+    "generate": 0,
+    "verify": 0,
+    "total": 0
+  },
+  "_note": "Sample generated from test fixtures (invented law text). Shape is the contract; content is illustrative."
+}

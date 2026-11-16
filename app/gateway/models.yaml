@@ -1,0 +1,61 @@
+# Model gateway configuration.
+# Stages ask for a ROLE; swapping a model is a change here, not in the pipeline.
+#
+# CHECK on Day 1: the exact API model ids below are placeholders taken from the
+# blueprint names. Copy the real ids from each provider's console / docs, and
+# confirm each chat provider accepts OpenAI-style /chat/completions with
+# response_format {"type": "json_object"}. Some reasoning models fix
+# temperature; if a provider rejects it, set temperature: null.
+
+providers:
+  deepseek:
+    kind: openai_chat
+    base_url: https://api.deepseek.com
+    api_key_env: DEEPSEEK_API_KEY
+  moonshot:
+    kind: openai_chat
+    base_url: https://api.moonshot.ai/v1
+    api_key_env: MOONSHOT_API_KEY
+  openai:
+    kind: openai_embed
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+  cohere:
+    kind: cohere_rerank
+    base_url: https://api.cohere.com/v2
+    api_key_env: COHERE_API_KEY
+
+roles:
+  understand:
+    provider: deepseek
+    model: deepseek-v4.1-flash        # CHECK exact id
+    temperature: 0
+    max_tokens: 800
+    timeout_s: 6
+    json_mode: true
+    fallback: null                    # e.g. {provider: ..., model: ...}
+  generate:
+    provider: moonshot
+    model: kimi-k2.5                  # CHECK exact id
+    temperature: 0.1
+    max_tokens: 2000
+    timeout_s: 14
+    json_mode: true
+    fallback: null                    # must NOT be the verify provider
+  verify:
+    provider: deepseek
+    model: deepseek-v4.1-flash        # CHECK exact id
+    temperature: 0
+    max_tokens: 1000
+    timeout_s: 6
+    json_mode: true
+    fallback: null
+  embed:
+    provider: openai
+    model: text-embedding-3-large
+    dimensions: 1024                  # must match data_versions.embedding_model / chunks.embedding
+    timeout_s: 3
+  rerank:
+    provider: cohere
+    model: rerank-v3.5                # CHECK latest multilingual rerank id
+    timeout_s: 3

@@ -1,0 +1,20 @@
+{
+  "request_id": "381fcc8529754e9d",
+  "type": "clarification",
+  "domain": "labour",
+  "coverage": null,
+  "answer": null,
+  "clarifying_question": "هل عقد عملك محدد المدة أم غير محدد المدة؟",
+  "referral": null,
+  "message": null,
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "total": 0
+  },
+  "_note": "Sample generated from test fixtures (invented law text). Shape is the contract; content is illustrative."
+}

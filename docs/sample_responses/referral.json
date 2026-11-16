@@ -1,0 +1,22 @@
+{
+  "request_id": "320e373fb3c64a67",
+  "type": "referral",
+  "domain": "labour",
+  "coverage": null,
+  "answer": null,
+  "clarifying_question": null,
+  "referral": {
+    "reason": "حالتك تحتاج إلى رأي محامٍ مختص، لأنها قد تتضمن إجراءات أو مخاطر لا تكفي فيها المعلومات العامة."
+  },
+  "message": null,
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "total": 0
+  },
+  "_note": "Sample generated from test fixtures (invented law text). Shape is the contract; content is illustrative."
+}
