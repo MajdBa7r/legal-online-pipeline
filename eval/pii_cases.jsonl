@@ -1,0 +1,150 @@
+{"id": "cor-001", "text": "اسمي عمار الخصاونة وبشتغل بشركة من خمس سنين، صاحب الشغل فصلني بدون إشعار، شو حقوقي؟", "group": "core", "tags": ["dialect", "strong_trigger", "name_in_list", "full_name"], "pii": [{"type": "name", "value": "عمار الخصاونة"}]}
+{"id": "cor-002", "text": "اسمي شادي، المالك بدو يطلعني من الشقة قبل ما يخلص العقد", "group": "core", "tags": ["dialect", "strong_trigger", "name_not_in_list"], "pii": [{"type": "name", "value": "شادي"}]}
+{"id": "cor-003", "text": "أنا يزن عمري 30 سنة وبدي أعرف كم يوم إجازة سنوية إلي", "group": "core", "tags": ["dialect", "weak_trigger", "name_in_list"], "pii": [{"type": "name", "value": "يزن"}]}
+{"id": "cor-004", "text": "مديري ناصر الفلاحات رفض يعطيني إجازة مرضية مع إنه معي تقرير", "group": "core", "tags": ["dialect", "weak_trigger", "name_not_in_list", "full_name"], "pii": [{"type": "name", "value": "ناصر الفلاحات"}]}
+{"id": "cor-005", "text": "صاحب البيت أبو معاذ قطع عني المي عشان أطلع", "group": "core", "tags": ["dialect", "kunya", "name_in_list"], "pii": [{"type": "name", "value": "معاذ"}]}
+{"id": "cor-006", "text": "أم غيث جارتنا أجرتني الشقة بدون عقد مكتوب، هل الإيجار صحيح؟", "group": "core", "tags": ["dialect", "kunya", "name_not_in_list"], "pii": [{"type": "name", "value": "غيث"}]}
+{"id": "cor-007", "text": "المدعو محمد الشرمان استلم مني 300 دينار عربون وما رجعهم", "group": "core", "tags": ["msa", "strong_trigger", "name_in_list", "full_name"], "pii": [{"type": "name", "value": "محمد الشرمان"}]}
+{"id": "cor-008", "text": "زوجتي هيا حامل بالشهر السابع، قديش إجازة الأمومة الها؟", "group": "core", "tags": ["dialect", "weak_trigger", "name_not_in_list"], "pii": [{"type": "name", "value": "هيا"}]}
+{"id": "cor-009", "text": "يا جماعة عمار السرحان صاحب المحل باعني تلفون خربان ورافض يرجعه", "group": "core", "tags": ["dialect", "no_trigger", "name_in_list", "full_name"], "pii": [{"type": "name", "value": "عمار السرحان"}]}
+{"id": "cor-010", "text": "تواصلت مع براء من الموارد البشرية وقالي ما إلك تعويض", "group": "core", "tags": ["dialect", "no_trigger", "name_not_in_list"], "pii": [{"type": "name", "value": "براء"}]}
+{"id": "cor-011", "text": "أعمل لدى السيد ماجد المومني منذ عام 2019 ولم يدفع أجري منذ ثلاثة أشهر", "group": "core", "tags": ["msa", "strong_trigger", "name_in_list", "full_name"], "pii": [{"type": "name", "value": "ماجد المومني"}]}
+{"id": "cor-012", "text": "قام صاحب العمل براء الفلاحات بإنهاء عقدي دون سابق إنذار", "group": "core", "tags": ["msa", "no_trigger", "name_not_in_list", "full_name"], "pii": [{"type": "name", "value": "براء الفلاحات"}]}
+{"id": "cor-013", "text": "ابني ماجد عمره 17 سنة، بقدر يشتغل بالعطلة الصيفية؟", "group": "core", "tags": ["dialect", "weak_trigger", "name_in_list"], "pii": [{"type": "name", "value": "ماجد"}]}
+{"id": "cor-014", "text": "الدكتور حلا العبادي كتبلي تقرير طبي بس الشركة رفضته", "group": "core", "tags": ["dialect", "strong_trigger", "name_not_in_list", "full_name"], "pii": [{"type": "name", "value": "حلا العبادي"}]}
+{"id": "cor-015", "text": "أخوي خالد اشتغل بمطعم شهرين وما دفعوله ولا قرش", "group": "core", "tags": ["dialect", "weak_trigger", "name_in_list"], "pii": [{"type": "name", "value": "خالد"}]}
+{"id": "cor-016", "text": "بنتي ضحى اشترت لابتوب أونلاين وطلع معيوب", "group": "core", "tags": ["dialect", "weak_trigger", "name_not_in_list"], "pii": [{"type": "name", "value": "ضحى"}]}
+{"id": "cor-017", "text": "كلمت الحاج مريم صاحب العمارة عن الصيانة وما رد", "group": "core", "tags": ["dialect", "strong_trigger", "name_in_list"], "pii": [{"type": "name", "value": "مريم"}]}
+{"id": "cor-018", "text": "اسمها قصي القيسي وهي المستأجرة عندي من 2015 وما دفعت آخر ست شهور", "group": "core", "tags": ["dialect", "strong_trigger", "name_not_in_list", "full_name"], "pii": [{"type": "name", "value": "قصي القيسي"}]}
+{"id": "cor-019", "text": "المستأجر فاطمة غير قفل الباب وما خلاني أدخل شقتي", "group": "core", "tags": ["dialect", "weak_trigger", "name_in_list"], "pii": [{"type": "name", "value": "فاطمة"}]}
+{"id": "cor-020", "text": "نرجو إفادتنا بخصوص الموظف براء السرحان الذي تغيب عن العمل عشرة أيام متتالية", "group": "core", "tags": ["msa", "no_trigger", "name_not_in_list", "full_name"], "pii": [{"type": "name", "value": "براء السرحان"}]}
+{"id": "cor-021", "text": "عمار هو المدير المباشر تبعي وبطلب مني أشتغل 12 ساعة", "group": "core", "tags": ["dialect", "no_trigger", "name_in_list"], "pii": [{"type": "name", "value": "عمار"}]}
+{"id": "cor-022", "text": "بعتت رسالة للمحامي عدي المجالي وما رد علي لهلأ", "group": "core", "tags": ["dialect", "no_trigger", "name_not_in_list", "full_name"], "pii": [{"type": "name", "value": "عدي المجالي"}]}
+{"id": "cor-023", "text": "السيدة زيد المجالي مالكة الشقة رفعت الأجرة مرتين بنفس السنة", "group": "core", "tags": ["msa", "strong_trigger", "name_in_list", "full_name"], "pii": [{"type": "name", "value": "زيد المجالي"}]}
+{"id": "cor-024", "text": "أبو مجد صاحب المصنع بقول إنه ما في ضمان للعمال المياومة", "group": "core", "tags": ["dialect", "kunya", "name_not_in_list"], "pii": [{"type": "name", "value": "مجد"}]}
+{"id": "cor-025", "text": "رقمي 0785906318 اتصلوا علي إذا في معلومة", "group": "core", "tags": ["dialect", "phone_local"], "pii": [{"type": "phone", "value": "0785906318"}]}
+{"id": "cor-026", "text": "هاد رقم المالك 077 385 0414 ما بيرد من أسبوع", "group": "core", "tags": ["dialect", "phone_spaced"], "pii": [{"type": "phone", "value": "077 385 0414"}]}
+{"id": "cor-027", "text": "إذا بدكم تتواصلوا معي على الواتس 077-988-8244", "group": "core", "tags": ["dialect", "phone_dashed"], "pii": [{"type": "phone", "value": "077-988-8244"}]}
+{"id": "cor-028", "text": "يمكن التواصل معي على الرقم +962 78 525 1994 لاستكمال البيانات", "group": "core", "tags": ["msa", "phone_intl"], "pii": [{"type": "phone", "value": "+962 78 525 1994"}]}
+{"id": "cor-029", "text": "صاحب المحل أعطاني رقمه +962780050747 وقال بس يتصلوا عليه", "group": "core", "tags": ["dialect", "phone_intl_compact"], "pii": [{"type": "phone", "value": "+962780050747"}]}
+{"id": "cor-030", "text": "الرجاء الاتصال بي على 00962790344170 بخصوص الشكوى", "group": "core", "tags": ["msa", "phone_00"], "pii": [{"type": "phone", "value": "00962790344170"}]}
+{"id": "cor-031", "text": "موبايلي ٠٧٩٩٨٢٦٧٩٦ وما وصلني ولا إشعار من الضمان", "group": "core", "tags": ["dialect", "phone_indic"], "pii": [{"type": "phone", "value": "٠٧٩٩٨٢٦٧٩٦"}]}
+{"id": "cor-032", "text": "0773421308 هاد رقم الموارد البشرية بالشركة", "group": "core", "tags": ["dialect", "phone_local"], "pii": [{"type": "phone", "value": "0773421308"}]}
+{"id": "cor-033", "text": "رقم المؤجر 078 550 2614 وبرفض يستلم الأجرة", "group": "core", "tags": ["dialect", "phone_spaced"], "pii": [{"type": "phone", "value": "078 550 2614"}]}
+{"id": "cor-034", "text": "اتصلت على 078-671-8183 رقم خدمة العملاء وسكروا بوجهي", "group": "core", "tags": ["dialect", "phone_dashed"], "pii": [{"type": "phone", "value": "078-671-8183"}]}
+{"id": "cor-035", "text": "هاتفي المحمول +962 77 849 2407", "group": "core", "tags": ["msa", "phone_intl"], "pii": [{"type": "phone", "value": "+962 77 849 2407"}]}
+{"id": "cor-036", "text": "بعتولي رسالة من الرقم +962796738687 إنه انفصلت", "group": "core", "tags": ["dialect", "phone_intl_compact"], "pii": [{"type": "phone", "value": "+962796738687"}]}
+{"id": "cor-037", "text": "رقم المدير 00962777337535 لو بدكم تتأكدوا", "group": "core", "tags": ["dialect", "phone_00"], "pii": [{"type": "phone", "value": "00962777337535"}]}
+{"id": "cor-038", "text": "تلفوني ٠٧٩٠٩٩٨٦٠٥ وتلفون أخوي إذا ما رديت", "group": "core", "tags": ["dialect", "phone_indic"], "pii": [{"type": "phone", "value": "٠٧٩٠٩٩٨٦٠٥"}]}
+{"id": "cor-039", "text": "رقمي الوطني 9839552346 وبدي أعرف كم اشتراك إلي بالضمان", "group": "core", "tags": ["dialect"], "pii": [{"type": "national_id", "value": "9839552346"}]}
+{"id": "cor-040", "text": "الرقم الوطني تبعي 2791818039", "group": "core", "tags": ["dialect"], "pii": [{"type": "national_id", "value": "2791818039"}]}
+{"id": "cor-041", "text": "الرقم الوطني للمؤمن عليه 9777828877 وقد تقدم بطلب تقاعد مبكر", "group": "core", "tags": ["msa"], "pii": [{"type": "national_id", "value": "9777828877"}]}
+{"id": "cor-042", "text": "9442075530 هاد رقمي الوطني إذا بدكم تفحصوا", "group": "core", "tags": ["dialect"], "pii": [{"type": "national_id", "value": "9442075530"}]}
+{"id": "cor-043", "text": "سجلوني بالضمان على رقم وطني 2180017493 مش إلي", "group": "core", "tags": ["dialect"], "pii": [{"type": "national_id", "value": "2180017493"}]}
+{"id": "cor-044", "text": "رقم الهوية 9078306160 والعامل مسجل منذ 2018", "group": "core", "tags": ["msa"], "pii": [{"type": "national_id", "value": "9078306160"}]}
+{"id": "cor-045", "text": "رقمي الوطني ٩٣٨٤٤٥٥٨٩٦", "group": "core", "tags": ["dialect", "indic_digits"], "pii": [{"type": "national_id", "value": "٩٣٨٤٤٥٥٨٩٦"}]}
+{"id": "cor-046", "text": "الرقم الوطني ٢٠٨٥١٠٤٥٥١ للمستأجر", "group": "core", "tags": ["msa", "indic_digits"], "pii": [{"type": "national_id", "value": "٢٠٨٥١٠٤٥٥١"}]}
+{"id": "cor-047", "text": "بطاقتي رقمها 2283747143 وانسرقت مع المحفظة", "group": "core", "tags": ["dialect"], "pii": [{"type": "national_id", "value": "2283747143"}]}
+{"id": "cor-048", "text": "أرجو التحقق من الرقم 9643752389 في سجلات المؤسسة", "group": "core", "tags": ["msa"], "pii": [{"type": "national_id", "value": "9643752389"}]}
+{"id": "cor-049", "text": "حولولي الراتب على الآيبان JO59 ARAB 4167 8689 2822 9857 4619 32 وما وصل", "group": "core", "tags": ["dialect", "iban_spaced"], "pii": [{"type": "iban", "value": "JO59 ARAB 4167 8689 2822 9857 4619 32"}]}
+{"id": "cor-050", "text": "رقم الآيبان JO61ETHI2368587824374835015716", "group": "core", "tags": ["dialect", "iban_compact"], "pii": [{"type": "iban", "value": "JO61ETHI2368587824374835015716"}]}
+{"id": "cor-051", "text": "أرجو تحويل المستحقات إلى الحساب JO29 CBJO 8632 1414 5752 2446 5982 61", "group": "core", "tags": ["msa", "iban_spaced"], "pii": [{"type": "iban", "value": "JO29 CBJO 8632 1414 5752 2446 5982 61"}]}
+{"id": "cor-052", "text": "هاد الآيبان تبع المالك JO37ETHI4333856641463500990576 بحولله الأجرة كل شهر", "group": "core", "tags": ["dialect", "iban_compact"], "pii": [{"type": "iban", "value": "JO37ETHI4333856641463500990576"}]}
+{"id": "cor-053", "text": "حسابي البنكي JO81 JONB 9447 2633 3533 6173 5829 77 والشركة بتقول إنها حولت", "group": "core", "tags": ["dialect", "iban_spaced"], "pii": [{"type": "iban", "value": "JO81 JONB 9447 2633 3533 6173 5829 77"}]}
+{"id": "cor-054", "text": "IBAN: JO91ETHI1236636675356327071671", "group": "core", "tags": ["msa", "iban_compact"], "pii": [{"type": "iban", "value": "JO91ETHI1236636675356327071671"}]}
+{"id": "cor-055", "text": "الشركة خصمت من راتبي اللي بنزل على JO32 ARAB 7047 2324 2014 7014 9484 68", "group": "core", "tags": ["dialect", "iban_spaced"], "pii": [{"type": "iban", "value": "JO32 ARAB 7047 2324 2014 7014 9484 68"}]}
+{"id": "cor-056", "text": "رقم حسابي الدولي JO65HBHO9008489104495738105577 لصرف بدل التعطل", "group": "core", "tags": ["msa", "iban_compact"], "pii": [{"type": "iban", "value": "JO65HBHO9008489104495738105577"}]}
+{"id": "cor-057", "text": "ايميلي sami.jo@outlook.com ابعتولي الرد عليه", "group": "core", "tags": ["dialect"], "pii": [{"type": "email", "value": "sami.jo@outlook.com"}]}
+{"id": "cor-058", "text": "بعتولي على sami.jo@yahoo.com إنه تم إنهاء خدمتي", "group": "core", "tags": ["dialect"], "pii": [{"type": "email", "value": "sami.jo@yahoo.com"}]}
+{"id": "cor-059", "text": "يرجى المراسلة على البريد الإلكتروني ahmad.k@company.jo", "group": "core", "tags": ["msa"], "pii": [{"type": "email", "value": "ahmad.k@company.jo"}]}
+{"id": "cor-060", "text": "هاد ايميل الموارد البشرية m.zoubi@hotmail.com وما بردوا", "group": "core", "tags": ["dialect"], "pii": [{"type": "email", "value": "m.zoubi@hotmail.com"}]}
+{"id": "cor-061", "text": "hr.manager@yahoo.com", "group": "core", "tags": ["msa"], "pii": [{"type": "email", "value": "hr.manager@yahoo.com"}]}
+{"id": "cor-062", "text": "بعتت شكوى من tala_m@gmail.com لحماية المستهلك", "group": "core", "tags": ["dialect"], "pii": [{"type": "email", "value": "tala_m@gmail.com"}]}
+{"id": "cor-063", "text": "البريد الخاص بي هو abu.zaid@company.jo", "group": "core", "tags": ["msa"], "pii": [{"type": "email", "value": "abu.zaid@company.jo"}]}
+{"id": "cor-064", "text": "المالك بعتلي إنذار على الايميل m.zoubi@gmail.com", "group": "core", "tags": ["dialect"], "pii": [{"type": "email", "value": "m.zoubi@gmail.com"}]}
+{"id": "cor-065", "text": "مقدم الطلب: غيث القيسي، الرقم الوطني: 9127344495، الهاتف: 079 387 0409", "group": "core", "tags": ["msa", "mixed"], "pii": [{"type": "name", "value": "غيث القيسي"}, {"type": "phone", "value": "079 387 0409"}, {"type": "national_id", "value": "9127344495"}]}
+{"id": "cor-066", "text": "مقدم الطلب: خالد العتوم، الرقم الوطني: 2491921502، الهاتف: 0788570718", "group": "core", "tags": ["msa", "mixed"], "pii": [{"type": "name", "value": "خالد العتوم"}, {"type": "phone", "value": "0788570718"}, {"type": "national_id", "value": "2491921502"}]}
+{"id": "cor-067", "text": "أنا ضحى النعيمات ورقمي الوطني 9986923535 وتلفوني 0780786649، المالك بدو يطلعني", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "ضحى النعيمات"}, {"type": "phone", "value": "0780786649"}, {"type": "national_id", "value": "9986923535"}]}
+{"id": "cor-068", "text": "مقدم الطلب: سامر العواملة، الرقم الوطني: 9304045660، الهاتف: +962 77 765 6903", "group": "core", "tags": ["msa", "mixed"], "pii": [{"type": "name", "value": "سامر العواملة"}, {"type": "phone", "value": "+962 77 765 6903"}, {"type": "national_id", "value": "9304045660"}]}
+{"id": "cor-069", "text": "اسمي ثامر المجالي، رقمي 079-259-9593، والرقم الوطني 2977120278، بدي أعرف شو حقوقي بعد ما انفصلت", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "ثامر المجالي"}, {"type": "phone", "value": "079-259-9593"}, {"type": "national_id", "value": "2977120278"}]}
+{"id": "cor-070", "text": "اسمي ثامر الجراح، رقمي +962 78 614 3320، والرقم الوطني 2527365477، بدي أعرف شو حقوقي بعد ما انفصلت", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "ثامر الجراح"}, {"type": "phone", "value": "+962 78 614 3320"}, {"type": "national_id", "value": "2527365477"}]}
+{"id": "cor-071", "text": "أنا ليث الخصاونة ورقمي الوطني 2074283310 وتلفوني 0788945748، المالك بدو يطلعني", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "ليث الخصاونة"}, {"type": "phone", "value": "0788945748"}, {"type": "national_id", "value": "2074283310"}]}
+{"id": "cor-072", "text": "اسمي أحمد المجالي، رقمي 077 822 9990، والرقم الوطني 2076658879، بدي أعرف شو حقوقي بعد ما انفصلت", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "أحمد المجالي"}, {"type": "phone", "value": "077 822 9990"}, {"type": "national_id", "value": "2076658879"}]}
+{"id": "cor-073", "text": "اسمي خالد الخصاونة، ايميلي abu.zaid@outlook.com، وحسابي JO02 ETHI 0242 5255 7397 4632 9964 78 وما نزل الراتب", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "خالد الخصاونة"}, {"type": "email", "value": "abu.zaid@outlook.com"}, {"type": "iban", "value": "JO02 ETHI 0242 5255 7397 4632 9964 78"}]}
+{"id": "cor-074", "text": "اسمي أحمد الفلاحات، ايميلي sami.jo@yahoo.com، وحسابي JO62 HBHO 0041 1591 8315 2797 5277 39 وما نزل الراتب", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "أحمد الفلاحات"}, {"type": "email", "value": "sami.jo@yahoo.com"}, {"type": "iban", "value": "JO62 HBHO 0041 1591 8315 2797 5277 39"}]}
+{"id": "cor-075", "text": "اسمي مريم المومني، ايميلي hr.manager@yahoo.com، وحسابي JO79 UBSI 1693 7494 8257 2544 1747 60 وما نزل الراتب", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "مريم المومني"}, {"type": "email", "value": "hr.manager@yahoo.com"}, {"type": "iban", "value": "JO79 UBSI 1693 7494 8257 2544 1747 60"}]}
+{"id": "cor-076", "text": "اسمي ناصر الدعجة، ايميلي ahmad.k@yahoo.com، وحسابي JO94 ETHI 0741 9548 5430 3071 6065 93 وما نزل الراتب", "group": "core", "tags": ["dialect", "mixed"], "pii": [{"type": "name", "value": "ناصر الدعجة"}, {"type": "email", "value": "ahmad.k@yahoo.com"}, {"type": "iban", "value": "JO94 ETHI 0741 9548 5430 3071 6065 93"}]}
+{"id": "ext-077", "text": "ساكن في عمان، جبل الحسين، شارع خالد بن الوليد، عمارة 12 والمالك بدو يطلعني", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "عمان، جبل الحسين، شارع خالد بن الوليد، عمارة 12"}]}
+{"id": "ext-078", "text": "عنواني اربد - حي التركمان - بناية رقم 7 الطابق الثاني", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "اربد - حي التركمان - بناية رقم 7 الطابق الثاني"}]}
+{"id": "ext-079", "text": "المأجور يقع في الزرقاء، حي معصوم، شارع 36، بيت رقم 14 وقد انتهت مدة العقد", "group": "extra", "tags": ["msa"], "pii": [{"type": "address", "value": "الزرقاء، حي معصوم، شارع 36، بيت رقم 14"}]}
+{"id": "ext-080", "text": "المحل اللي اشتريت منه موقعه خلدا، شارع وصفي التل، مجمع النور، شقة 4", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "خلدا، شارع وصفي التل، مجمع النور، شقة 4"}]}
+{"id": "ext-081", "text": "عنوان السكن: طبربور، اسكان الأطباء، عمارة 22 شقة 6", "group": "extra", "tags": ["msa"], "pii": [{"type": "address", "value": "طبربور، اسكان الأطباء، عمارة 22 شقة 6"}]}
+{"id": "ext-082", "text": "الشقة اللي مستأجرها بالسلط، حي الجدعة، قرب مسجد الأنصار، الطابق الأرضي فيها رطوبة والمالك ما بدو يصلح", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "السلط، حي الجدعة، قرب مسجد الأنصار، الطابق الأرضي"}]}
+{"id": "ext-083", "text": "ساكن في ماركا الشمالية شارع الملك عبدالله الأول عمارة 5 والمالك بدو يطلعني", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "ماركا الشمالية شارع الملك عبدالله الأول عمارة 5"}]}
+{"id": "ext-084", "text": "عنواني العقبة، المنطقة العاشرة، فيلا رقم 31", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "العقبة، المنطقة العاشرة، فيلا رقم 31"}]}
+{"id": "ext-085", "text": "المأجور يقع في مادبا، حي الكرك، شارع 15، الطابق الثالث وقد انتهت مدة العقد", "group": "extra", "tags": ["msa"], "pii": [{"type": "address", "value": "مادبا، حي الكرك، شارع 15، الطابق الثالث"}]}
+{"id": "ext-086", "text": "المحل اللي اشتريت منه موقعه جرش، سوف، بجانب المدرسة الثانوية، بيت أبو سند", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "جرش، سوف، بجانب المدرسة الثانوية، بيت أبو سند"}]}
+{"id": "ext-087", "text": "عنوان السكن: عمان - الصويفية - شارع باريس - عمارة 9 - شقة 11", "group": "extra", "tags": ["msa"], "pii": [{"type": "address", "value": "عمان - الصويفية - شارع باريس - عمارة 9 - شقة 11"}]}
+{"id": "ext-088", "text": "الشقة اللي مستأجرها بالمفرق، حي الحسين، شارع 20 بيت رقم 3 فيها رطوبة والمالك ما بدو يصلح", "group": "extra", "tags": ["dialect"], "pii": [{"type": "address", "value": "المفرق، حي الحسين، شارع 20 بيت رقم 3"}]}
+{"id": "ext-089", "text": "نمرة سيارتي 50-85429 وصاحب الشغل حجزها", "group": "extra", "tags": ["dialect"], "pii": [{"type": "plate", "value": "50-85429"}]}
+{"id": "ext-090", "text": "رقم اللوحة 14-36796 والسيارة مسجلة باسم الشركة", "group": "extra", "tags": ["msa"], "pii": [{"type": "plate", "value": "14-36796"}]}
+{"id": "ext-091", "text": "السيارة 22-38453 صدمتني وأنا رايح عالشغل، هل بتعتبر إصابة عمل؟", "group": "extra", "tags": ["dialect"], "pii": [{"type": "plate", "value": "22-38453"}]}
+{"id": "ext-092", "text": "سيارة المالك نمرتها ٥٠-٧٠٨٧١ صافة قدام باب المحل", "group": "extra", "tags": ["dialect", "indic_digits"], "pii": [{"type": "plate", "value": "٥٠-٧٠٨٧١"}]}
+{"id": "ext-093", "text": "المركبة رقم 10-1661 مملوكة للمؤسسة", "group": "extra", "tags": ["msa"], "pii": [{"type": "plate", "value": "10-1661"}]}
+{"id": "ext-094", "text": "شفت السيارة ١٤-٨٣٧٩٠ بتكسر الزجاج", "group": "extra", "tags": ["dialect", "indic_digits"], "pii": [{"type": "plate", "value": "١٤-٨٣٧٩٠"}]}
+{"id": "ext-095", "text": "بعت السيارة 17-2584 وما دفعلي الشاري", "group": "extra", "tags": ["dialect"], "pii": [{"type": "plate", "value": "17-2584"}]}
+{"id": "ext-096", "text": "لوحة رقم 50-97124", "group": "extra", "tags": ["msa"], "pii": [{"type": "plate", "value": "50-97124"}]}
+{"id": "ext-097", "text": "الباص 13-73476 اللي بنقل العمال عمل حادث", "group": "extra", "tags": ["dialect"], "pii": [{"type": "plate", "value": "13-73476"}]}
+{"id": "ext-098", "text": "نمرة الفان تبع الشركة ١٢-٨٩٣٥٨", "group": "extra", "tags": ["dialect", "indic_digits"], "pii": [{"type": "plate", "value": "١٢-٨٩٣٥٨"}]}
+{"id": "ext-099", "text": "المخالفة كانت على السيارة 21-5819", "group": "extra", "tags": ["msa"], "pii": [{"type": "plate", "value": "21-5819"}]}
+{"id": "ext-100", "text": "سيارة توصيل رقمها 17-12774 وصلت الطلب خربان", "group": "extra", "tags": ["dialect"], "pii": [{"type": "plate", "value": "17-12774"}]}
+{"id": "neg-101", "text": "راتبي 450 دينار وبدأت الشغل سنة 2021 ومدة العقد 12 شهر", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-102", "text": "حسب المادة 23 من قانون العمل رقم 8 لسنة 1996 لازم إشعار شهر", "group": "negative", "tags": ["law_numbers"], "pii": []}
+{"id": "neg-103", "text": "رقم القضية 1234/2023 وما صار في جلسة لهلأ", "group": "negative", "tags": ["case_number"], "pii": []}
+{"id": "neg-104", "text": "دفعت 1500 دينار تأمين للشقة وعقد الإيجار من 1/1/2020 لمدة 3 سنوات", "group": "negative", "tags": ["numbers", "dates"], "pii": []}
+{"id": "neg-105", "text": "أمل تبعي إني أرجع حقي من الشركة", "group": "negative", "tags": ["name_like_word"], "pii": []}
+{"id": "neg-106", "text": "نور الشقة مقطوع من يومين والمالك مش سائل", "group": "negative", "tags": ["name_like_word"], "pii": []}
+{"id": "neg-107", "text": "سلام عليكم، سؤالي عن الإجازات المرضية", "group": "negative", "tags": ["name_like_word"], "pii": []}
+{"id": "neg-108", "text": "شركة الاتصالات خصمت من راتبي بدون سبب", "group": "negative", "tags": ["company"], "pii": []}
+{"id": "neg-109", "text": "اشتغلت 10 سنين وعمري 45 سنة، بقدر أطلع تقاعد مبكر؟", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-110", "text": "رقم الطلب 2024112233 ولسا ما ردوا علي", "group": "negative", "tags": ["hard_negative_10_digits"], "pii": []}
+{"id": "neg-111", "text": "اشتريت تلفون ب 350 دينار وطلع فيه عيب مصنعي", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-112", "text": "الإجازة السنوية 14 يوم وبعد 5 سنين بتصير 21 يوم", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-113", "text": "المالك رفع الأجرة من 250 إلى 300 دينار", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-114", "text": "كم نسبة الاقتطاع من الراتب للضمان الاجتماعي؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-115", "text": "هل بحقلي تعويض نهاية خدمة إذا استقلت؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-116", "text": "الشركة بتشغلنا 10 ساعات باليوم بدون إضافي", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-117", "text": "شو الفرق بين العقد محدد المدة وغير محدد المدة؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-118", "text": "بدي أرجع غسالة اشتريتها قبل أسبوع وطلعت خربانة", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-119", "text": "عقد الإيجار انتهى بتاريخ 31/8/2023 والمستأجر رافض يطلع", "group": "negative", "tags": ["dates"], "pii": []}
+{"id": "neg-120", "text": "المادة 28 من قانون العمل بتسمح بالفصل بدون إشعار بحالات معينة", "group": "negative", "tags": ["law_numbers"], "pii": []}
+{"id": "neg-121", "text": "حماية المستهلك بتقبل شكاوى أونلاين؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-122", "text": "أبوي بشتغل بالقطاع الخاص من 30 سنة وبدو يتقاعد", "group": "negative", "tags": ["name_like_word"], "pii": []}
+{"id": "neg-123", "text": "ساكن بعمان وبشتغل بالزرقاء، المواصلات على حسابي؟", "group": "negative", "tags": ["place_names"], "pii": []}
+{"id": "neg-124", "text": "شارع الملك عبدالله الثاني فيه محلات كثير بتبيع بدون فواتير", "group": "negative", "tags": ["hard_negative_public_name"], "pii": []}
+{"id": "neg-125", "text": "جامعة الحسين بن طلال بتعطي إجازة أمومة أطول؟", "group": "negative", "tags": ["hard_negative_public_name"], "pii": []}
+{"id": "neg-126", "text": "مستشفى الأمير حمزة رفض يعطيني تقرير إصابة عمل", "group": "negative", "tags": ["hard_negative_public_name"], "pii": []}
+{"id": "neg-127", "text": "قانون الضمان الاجتماعي رقم 1 لسنة 2014 هل لسا ساري؟", "group": "negative", "tags": ["law_numbers"], "pii": []}
+{"id": "neg-128", "text": "دفعت فاتورة 89.50 دينار وما أعطوني إيصال", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-129", "text": "كم مدة الإشعار إذا بدي أترك الشغل؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-130", "text": "صاحب العمل بدو يخصم 3 أيام من راتبي لأني تأخرت", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-131", "text": "انصابيت بالشغل يوم 12 آذار وما سجلوها إصابة", "group": "negative", "tags": ["dates"], "pii": []}
+{"id": "neg-132", "text": "في 3 عمال بالمحل ما إلهم ضمان", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-133", "text": "الأجرة السنوية 3600 دينار تدفع على أربع دفعات", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-134", "text": "المحكمة حكمت لي ب 2000 دينار وما نفذوا الحكم", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-135", "text": "رقم الشكوى في الوزارة 556677 ولسا ما في رد", "group": "negative", "tags": ["case_number"], "pii": []}
+{"id": "neg-136", "text": "أنا موظف بشركة خاصة وما بعطوني إجازة سنوية", "group": "negative", "tags": ["weak_trigger_no_name"], "pii": []}
+{"id": "neg-137", "text": "أنا مستأجر من 1995 هل بيطبق علي القانون القديم؟", "group": "negative", "tags": ["weak_trigger_no_name"], "pii": []}
+{"id": "neg-138", "text": "زوجتي بتشتغل بمدرسة خاصة وفصلوها وهي حامل", "group": "negative", "tags": ["weak_trigger_no_name"], "pii": []}
+{"id": "neg-139", "text": "ابني عمره 16 سنة، مسموح يشتغل؟", "group": "negative", "tags": ["weak_trigger_no_name"], "pii": []}
+{"id": "neg-140", "text": "صاحب المحل رفض يرجعلي المصاري", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-141", "text": "السلعة طلعت مغشوشة والكفالة سنة", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-142", "text": "هل الضمان بيصرف بدل تعطل إذا انفصلت؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-143", "text": "الراتب الأساسي 600 والعلاوات 150", "group": "negative", "tags": ["numbers"], "pii": []}
+{"id": "neg-144", "text": "قطعوا الكهرباء عن المحل لأني تأخرت بالأجرة شهر", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-145", "text": "وظيفتي محاسب ومديري بطلب أشتغل يوم الجمعة", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-146", "text": "هل بيجوز للمالك يدخل الشقة بدون إذني؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-147", "text": "وصلني إنذار عدلي بالإخلاء، شو بعمل؟", "group": "negative", "tags": [], "pii": []}
+{"id": "neg-148", "text": "بيت أبوي مأجر من زمان بأجرة قليلة كثير", "group": "negative", "tags": ["name_like_word"], "pii": []}
+{"id": "neg-149", "text": "مكتب العمل في إربد قالولي أرفع قضية", "group": "negative", "tags": ["place_names"], "pii": []}
+{"id": "neg-150", "text": "الكفالة مكتوب فيها 24 شهر بس المحل رافض يصلح", "group": "negative", "tags": ["numbers"], "pii": []}
