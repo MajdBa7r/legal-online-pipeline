@@ -15,12 +15,36 @@ question -> 1 mask PII -> 2 understand -> 3 gate -> 4a domain pack | 4b search +
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # locally; on Replit put these in Secrets
-pytest                          # 32 tests, no keys or network needed
+pytest                          # 62 tests (58 + 4 that need data/dev/), no keys or network needed
 python scripts/check_models.py  # Day 1: every model role answers, with latency
 python scripts/check_supabase.py  # Day 1: DB latency, data version, pack sizes, hybrid_search
 uvicorn app.main:app --reload --port 8000
 python scripts/smoke_test.py "كم يوم إجازة سنوية بستحق؟" --show
 ```
+
+## Local development data (now) vs Supabase (later)
+
+`STORE_BACKEND=local` (the default) runs the whole pipeline on the scraper team's JSON files; `STORE_BACKEND=supabase`
+switches to the Data team's database. Both implement the same `Store` interface (`app/db/store.py`), so nothing
+else changes.
+
+1. Download these four files from the scraper team's Drive folder (`laws/<year>/`) into `data/dev/`
+   (the folder is git-ignored; each team member downloads their own copy):
+
+   | Domain | File | Drive folder |
+   | --- | --- | --- |
+   | Labour | `lob-2-3392.json` | `laws/1996` |
+   | Rentals (Owners and Tenants) | `lob-2-2803.json` | `laws/1994` |
+   | Social Security | `lob-2-3391.json` | `laws/2014` |
+   | Consumer Protection | `lob-2-3169.json` | `laws/2017` |
+
+2. `python scripts/inspect_corpus.py`: status of each law, article counts, known data issues.
+3. `python scripts/eval_retrieval.py --show-misses`: keyword retrieval baseline on `eval/retrieval_smoke.jsonl`.
+4. Optional, needs `OPENAI_API_KEY`: `python scripts/build_local_embeddings.py`, then
+   `python scripts/eval_retrieval.py --hybrid`.
+
+The JSON files are read-only to the code: mapping (IDs `lob-2-3392:61`, status, last amendment), normalization and
+chunking happen in memory in `app/db/local_store.py`. Law-to-domain mapping is `app/db/local_domains.yaml`.
 
 Streaming progress for the website: send `Accept: text/event-stream` to `/api/ask`. You get `stage` events
 (`understanding`, `searching`, `writing`, `checking`) and then one `result` event with the final JSON.
@@ -41,7 +65,8 @@ Sample responses for the website team are in `docs/sample_responses/`.
 | `app/prompts/` | Prompts and few-shot examples | A (understand), B (generate, verify) |
 | `app/schemas/api.py` | Public API contract with the website | Both, agreed with the Web team |
 | `app/schemas/llm.py` | JSON schema per model role | Both |
-| `app/db/store.py`, `schema_map.py` | Supabase access; all table and column names | B |
+| `app/db/store.py`, `schema_map.py` | `Store` interface; Supabase access; all table and column names | B |
+| `app/db/local_store.py`, `local_domains.yaml`, `factory.py` | Local development store on the scraped JSON; backend switch | B |
 | `app/rules/gate_rules.yaml` | Referral keywords, thresholds | Legal members |
 | `app/messages.py` | Fixed Arabic texts shown to users | Legal members + Web team |
 | `sql/` | Proposed `hybrid_search` contract and `traces` table for the Data team | B |

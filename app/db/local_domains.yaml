@@ -1,0 +1,18 @@
+# Local development only: which scraped law belongs to which focus domain.
+# The scraper output has no domain tags yet; the Data team will provide them in Supabase later.
+# Keys are the scraper's law_id (the Legislation and Opinion Bureau ID). Laws not listed here
+# are still loaded and searchable, with domain = null ("other").
+
+laws:
+  lob-2-3392:
+    domain: labour
+    name: قانون العمل رقم 8 لسنة 1996
+  lob-2-2803:
+    domain: rentals
+    name: قانون المالكين والمستأجرين رقم 11 لسنة 1994
+  lob-2-3391:
+    domain: social_security
+    name: قانون الضمان الاجتماعي رقم 1 لسنة 2014
+  lob-2-3169:
+    domain: consumer_protection
+    name: قانون حماية المستهلك رقم 7 لسنة 2017

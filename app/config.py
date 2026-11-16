@@ -6,6 +6,7 @@ from dataclasses import dataclass, fields
 from pathlib import Path
 
 APP_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = APP_DIR.parent
 
 
 def _cast(value: str, typ):
@@ -20,6 +21,13 @@ def _cast(value: str, typ):
 
 @dataclass(frozen=True)
 class Settings:
+    # Storage backend: "local" (scraped JSON files, development) or "supabase" (Data team's database)
+    store_backend: str = "local"
+    local_data_dir: str = str(PROJECT_DIR / "data" / "dev")
+    local_embeddings_dir: str = str(PROJECT_DIR / "data" / "dev" / "embeddings")
+    local_traces_path: str = str(PROJECT_DIR / "logs" / "traces.jsonl")
+    chunk_max_chars: int = 1200
+
     # Supabase (service key lives only on the backend)
     supabase_url: str = ""
     supabase_service_key: str = ""

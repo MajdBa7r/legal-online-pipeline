@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import Settings
 from app.context import Deadline, RequestCtx
-from app.db.store import SupabaseStore
+from app.db.factory import make_store
 from app.gateway.client import ModelGateway
 from app.orchestrator import Pipeline
 from app.pii.masker import PIIMasker
@@ -34,7 +34,10 @@ async def lifespan(app: FastAPI):
     gw.validate()
     if missing := gw.missing_keys():
         log.warning("missing API keys: %s", ", ".join(missing))
-    store = SupabaseStore(settings.supabase_url, settings.supabase_service_key, http)
+    store = make_store(settings, http)
+    log.info("store backend: %s", settings.store_backend)
+    for w in getattr(store, "warnings", []):
+        log.warning("store: %s", w)
     res = Resources.from_settings(settings)
     try:
         await res.load(store)

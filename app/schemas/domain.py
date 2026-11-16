@@ -26,6 +26,12 @@ class Article:
     gazette: str | None = None
     domain: str | None = None
     coverage_level: str | None = None
+    # Provenance and status detail (optional; the Supabase store may leave them unset)
+    law_status_raw: str | None = None   # status exactly as the source displays it
+    law_amended: bool = False           # law-level "amended" marker from the source
+    repeal_evidence: str | None = None  # why an article is treated as repealed, if it is
+    chapter: str | None = None
+    article_source_url: str | None = None
 
     def in_force(self) -> bool:
         return not self.repealed and self.law_status == "in_force"

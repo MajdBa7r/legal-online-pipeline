@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "law_id": "lob-2-9003",
+ "title_ar": "قانون الإيجار القديم الملغى رقم 7 لسنة 1953",
+ "law_number": "2",
+ "release_year": 1990,
+ "status_as_displayed_ar": "غير ساري",
+ "source_url": "https://www.jolaws.com/t/lob-2-9002/y",
+ "official_source_url": "https://lob.gov.jo/x9002",
+ "scraped_at": "2026-11-15T08:00:00.000Z",
+ "publication_date": "1990-01-01",
+ "publication_date_raw_ar": "x",
+ "effective_date": null,
+ "effective_date_raw_ar": null,
+ "gazette": {
+  "issue_number": "2222",
+  "page_number": "33",
+  "citation_as_displayed_ar": "y"
+ },
+ "article_count_as_displayed": 1,
+ "articles": [
+  {
+   "number": "1",
+   "label_ar": "المادة 1",
+   "chapter_ar": null,
+   "position": 1,
+   "text_ar": "يجوز للمالك إخلاء المأجور إذا تخلف المستأجر عن دفع بدل الإجارة.",
+   "source_url": "https://www.jolaws.com/t/lob-2-9001/x/m/1",
+   "extraction_method": "detail_page"
+  }
+ ],
+ "legislation_references": [],
+ "attachments": []
+}

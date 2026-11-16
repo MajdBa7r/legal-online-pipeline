@@ -1,0 +1,40 @@
+{"id": "lab-01", "domain": "labour", "style": "formal", "query": "مدة الإجازة السنوية للعامل بأجر كامل", "expected": ["lob-2-3392:61"]}
+{"id": "lab-02", "domain": "labour", "style": "dialect", "query": "كم يوم اجازة سنوية بستاهل بالشغل", "expected": ["lob-2-3392:61"]}
+{"id": "lab-03", "domain": "labour", "style": "formal", "query": "مدة الإشعار عند إنهاء عقد العمل غير محدد المدة", "expected": ["lob-2-3392:23"]}
+{"id": "lab-04", "domain": "labour", "style": "dialect", "query": "بدي استقيل من الشغل كم لازم ابلغ صاحب العمل قبل ما اترك", "expected": ["lob-2-3392:23"]}
+{"id": "lab-05", "domain": "labour", "style": "formal", "query": "الحالات التي يجوز فيها لصاحب العمل فصل العامل دون إشعار", "expected": ["lob-2-3392:28"]}
+{"id": "lab-06", "domain": "labour", "style": "formal", "query": "حق العامل في ترك العمل دون إشعار مع احتفاظه بحقوقه القانونية", "expected": ["lob-2-3392:29"]}
+{"id": "lab-07", "domain": "labour", "style": "formal", "query": "الفصل التعسفي وتعويض العامل", "expected": ["lob-2-3392:25"]}
+{"id": "lab-08", "domain": "labour", "style": "dialect", "query": "فصلوني من الشغل تعسفي شو بستاهل تعويض", "expected": ["lob-2-3392:25"]}
+{"id": "lab-09", "domain": "labour", "style": "formal", "query": "إجازة الأمومة للمرأة العاملة قبل الوضع وبعده", "expected": ["lob-2-3392:70", "lob-2-3391:45"]}
+{"id": "lab-10", "domain": "labour", "style": "formal", "query": "الإجازة المرضية للعامل بأجر كامل", "expected": ["lob-2-3392:65"]}
+{"id": "lab-11", "domain": "labour", "style": "formal", "query": "الحد الأقصى لساعات العمل اليومية والأسبوعية", "expected": ["lob-2-3392:56"]}
+{"id": "lab-12", "domain": "labour", "style": "dialect", "query": "كم ساعة مسموح يشغلوني باليوم", "expected": ["lob-2-3392:56"]}
+{"id": "lab-13", "domain": "labour", "style": "formal", "query": "أجر العمل الإضافي بموافقة العامل", "expected": ["lob-2-3392:59"]}
+{"id": "lab-14", "domain": "labour", "style": "formal", "query": "مكافأة نهاية الخدمة للعامل غير الخاضع لقانون الضمان الاجتماعي", "expected": ["lob-2-3392:32"]}
+{"id": "lab-15", "domain": "labour", "style": "formal", "query": "الحالات التي يجوز فيها حسم مبلغ من أجر العامل", "expected": ["lob-2-3392:47"]}
+{"id": "lab-16", "domain": "labour", "style": "formal", "query": "تشغيل الحدث الذي لم يكمل السادسة عشرة", "expected": ["lob-2-3392:73", "lob-2-3392:74", "lob-2-3392:75"]}
+{"id": "ren-01", "domain": "rentals", "style": "formal", "query": "حق المستأجر في الاستمرار في إشغال المأجور بعد انتهاء مدة الإجارة", "expected": ["lob-2-2803:5"]}
+{"id": "ren-02", "domain": "rentals", "style": "formal", "query": "إخلاء المأجور إذا تخلف المستأجر عن دفع بدل الإجارة", "expected": ["lob-2-2803:5"]}
+{"id": "ren-03", "domain": "rentals", "style": "dialect", "query": "المستأجر ما دفع الاجار من شهور كيف بقدر اطلعه من الشقة", "expected": ["lob-2-2803:5", "lob-2-2803:19"]}
+{"id": "ren-04", "domain": "rentals", "style": "formal", "query": "تخلية العقار لغرض الهدم وإعادة البناء", "expected": ["lob-2-2803:9"]}
+{"id": "ren-05", "domain": "rentals", "style": "formal", "query": "قيام المالك بقطع المياه لإزعاج المستأجر وإجباره على التخلية", "expected": ["lob-2-2803:17"]}
+{"id": "ren-06", "domain": "rentals", "style": "dialect", "query": "صاحب البيت قطع عني المي عشان اطلع من الشقة", "expected": ["lob-2-2803:17"]}
+{"id": "ren-07", "domain": "rentals", "style": "formal", "query": "حق أفراد أسرة المستأجر في إشغال المأجور بعد وفاته", "expected": ["lob-2-2803:7"]}
+{"id": "ren-08", "domain": "rentals", "style": "formal", "query": "عقد الإجارة سند تنفيذي للمطالبة بالأجور المستحقة", "expected": ["lob-2-2803:18"]}
+{"id": "con-01", "domain": "consumer_protection", "style": "formal", "query": "إرجاع السلعة المعيبة ورد ثمنها للمستهلك", "expected": ["lob-2-3169:7"]}
+{"id": "con-02", "domain": "consumer_protection", "style": "dialect", "query": "اشتريت غسالة طلعت خربانة بدي ارجعها ويرجعولي مصاري", "expected": ["lob-2-3169:7", "lob-2-3169:6"]}
+{"id": "con-03", "domain": "consumer_protection", "style": "formal", "query": "حظر الإعلان المضلل للمستهلك", "expected": ["lob-2-3169:8"]}
+{"id": "con-04", "domain": "consumer_protection", "style": "formal", "query": "التزام المزود بخدمات ما بعد البيع والصيانة وقطع الغيار", "expected": ["lob-2-3169:5"]}
+{"id": "con-05", "domain": "consumer_protection", "style": "formal", "query": "بطلان الشروط التعسفية في العقد بين المزود والمستهلك", "expected": ["lob-2-3169:22", "lob-2-3169:21"]}
+{"id": "con-06", "domain": "consumer_protection", "style": "formal", "query": "عقوبة مخالفة أحكام قانون حماية المستهلك بالغرامة", "expected": ["lob-2-3169:25"]}
+{"id": "ss-01", "domain": "social_security", "style": "formal", "query": "شروط تخصيص راتب التقاعد المبكر للمؤمن عليه", "expected": ["lob-2-3391:64"]}
+{"id": "ss-02", "domain": "social_security", "style": "dialect", "query": "بدي اطلع تقاعد مبكر من الضمان شو الشروط", "expected": ["lob-2-3391:64"]}
+{"id": "ss-03", "domain": "social_security", "style": "formal", "query": "شروط استحقاق راتب تقاعد الشيخوخة", "expected": ["lob-2-3391:62"]}
+{"id": "ss-04", "domain": "social_security", "style": "formal", "query": "شروط استحقاق بدل التعطل عن العمل", "expected": ["lob-2-3391:50"]}
+{"id": "ss-05", "domain": "social_security", "style": "dialect", "query": "انفصلت من شغلي هل الضمان بصرفلي شي لحد ما الاقي شغل", "expected": ["lob-2-3391:50", "lob-2-3391:52", "lob-2-3391:49"]}
+{"id": "ss-06", "domain": "social_security", "style": "formal", "query": "بدل إجازة الأمومة الذي تصرفه المؤسسة للمؤمن عليها", "expected": ["lob-2-3391:45"]}
+{"id": "ss-07", "domain": "social_security", "style": "formal", "query": "البدل اليومي للمصاب إذا حالت إصابة العمل دون أداء عمله", "expected": ["lob-2-3391:29"]}
+{"id": "ss-08", "domain": "social_security", "style": "formal", "query": "الانتساب الاختياري إلى تأمين الشيخوخة والعجز والوفاة", "expected": ["lob-2-3391:7"]}
+{"id": "ss-09", "domain": "social_security", "style": "formal", "query": "إثبات السن بشهادة ولادة رسمية", "expected": ["lob-2-3391:61"]}
+{"id": "ss-10", "domain": "social_security", "style": "formal", "query": "الجمع بين راتب التقاعد والأجر من العمل", "expected": ["lob-2-3391:85", "lob-2-3391:63"]}

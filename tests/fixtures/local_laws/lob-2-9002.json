@@ -1,0 +1,61 @@
+{
+ "schema_version": 1,
+ "law_id": "lob-2-9002",
+ "title_ar": "قانون الإيجار التجريبي رقم 2 لسنة 1990",
+ "law_number": "2",
+ "release_year": 1990,
+ "status_as_displayed_ar": "ساري",
+ "source_url": "https://www.jolaws.com/t/lob-2-9002/y",
+ "official_source_url": "https://lob.gov.jo/x9002",
+ "scraped_at": "2026-11-15T08:00:00.000Z",
+ "publication_date": "1990-01-01",
+ "publication_date_raw_ar": "x",
+ "effective_date": null,
+ "effective_date_raw_ar": null,
+ "gazette": {
+  "issue_number": "2222",
+  "page_number": "33",
+  "citation_as_displayed_ar": "y"
+ },
+ "article_count_as_displayed": 4,
+ "articles": [
+  {
+   "number": "1",
+   "label_ar": "المادة 1",
+   "chapter_ar": null,
+   "position": 1,
+   "text_ar": "يسمى هذا القانون (قانون الإيجار التجريبي).",
+   "source_url": "https://www.jolaws.com/t/lob-2-9001/x/m/1",
+   "extraction_method": "detail_page"
+  },
+  {
+   "number": "2",
+   "label_ar": "المادة 2",
+   "chapter_ar": null,
+   "position": 2,
+   "text_ar": "يجوز للمالك إخلاء المأجور إذا تخلف المستأجر عن دفع بدل الإجارة خلال خمسة عشر يوما من تاريخ تبليغه بالإنذار.",
+   "source_url": "https://www.jolaws.com/t/lob-2-9001/x/m/2",
+   "extraction_method": "detail_page"
+  },
+  {
+   "number": "3",
+   "label_ar": "المادة 3",
+   "chapter_ar": null,
+   "position": 3,
+   "text_ar": "يحظر على المالك قطع المياه أو الكهرباء عن المأجور بقصد إزعاج المستأجر أو إجباره على التخلية.\nالمادة (3) مكررة:\nللمستأجر أن يطلب من المحكمة إلزام المالك بإعادة الخدمات المقطوعة.",
+   "source_url": "https://www.jolaws.com/t/lob-2-9001/x/m/3",
+   "extraction_method": "detail_page"
+  },
+  {
+   "number": "4",
+   "label_ar": "المادة 4",
+   "chapter_ar": null,
+   "position": 4,
+   "text_ar": "تعاد دراسة بدل الإجارة كل خمس سنوات و?لك وفق أجر المثل.",
+   "source_url": "https://www.jolaws.com/t/lob-2-9001/x/m/4",
+   "extraction_method": "detail_page"
+  }
+ ],
+ "legislation_references": [],
+ "attachments": []
+}
