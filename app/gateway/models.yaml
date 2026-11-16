@@ -28,7 +28,7 @@ providers:
 roles:
   understand:
     provider: deepseek
-    model: deepseek-v4.1-flash        # CHECK exact id
+    model: deepseek-flash             # confirmed via /models on 2026-11-17
     temperature: 0
     max_tokens: 800
     timeout_s: 6
@@ -44,7 +44,7 @@ roles:
     fallback: null                    # must NOT be the verify provider
   verify:
     provider: deepseek
-    model: deepseek-v4.1-flash        # CHECK exact id
+    model: deepseek-flash         # CHECK exact id
     temperature: 0
     max_tokens: 1000
     timeout_s: 6
