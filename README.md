@@ -10,6 +10,17 @@ question -> 1 mask PII -> 2 understand -> 3 gate -> 4a domain pack | 4b search +
          -> 5 generate -> 6 verify (code + model) -> 7 decide (rewrite once) -> restore PII -> response
 ```
 
+## Project documents
+
+| Document | For | Contents |
+|---|---|---|
+| [`docs/PRODUCT_SCOPE.md`](docs/PRODUCT_SCOPE.md) | Everyone | What the assistant does, for whom, supported laws, user journey, MVP boundaries, limitations |
+| [`docs/SYSTEM_ARCHITECTURE.md`](docs/SYSTEM_ARCHITECTURE.md) | Supervisor, all teams | Offline and online pipelines, team integration diagrams, component table, API flow, cross-check against the code |
+| [`docs/diagrams/`](docs/diagrams/) | Presentations | Mermaid sources: overview, offline pipeline, online pipeline (2 parts), team integration |
+| [`docs/HANDOFF_WEB_TEAM.md`](docs/HANDOFF_WEB_TEAM.md) | Web Team | API contract, response states, citation and status display, privacy notice |
+| [`docs/HANDOFF_DATA_TEAM.md`](docs/HANDOFF_DATA_TEAM.md) | Data Team | Data format, identifiers, retrieval, updates, items to agree |
+| [`docs/MVP_STATUS.md`](docs/MVP_STATUS.md) | Everyone | Validation results and known limitations |
+
 ## Run it
 
 ```bash

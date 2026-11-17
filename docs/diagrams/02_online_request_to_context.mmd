@@ -1,0 +1,92 @@
+flowchart LR
+  %% B1. Online pipeline, part 1: from the browser to the legal context (continues in 03)
+  subgraph WEB["Web Team"]
+    UI["Website UI<br/>privacy notice, question box"]
+  end
+
+  subgraph API["API layer (app/main.py)"]
+    direction TB
+    EP["POST /api/ask<br/>JSON or text/event-stream"]
+    CORS["CORS (only if CORS_ORIGINS set)"]
+    PIIS["PII readiness check<br/>production + name model not loaded<br/>-> HTTP 503"]
+    VAL["Request validation (Pydantic AskRequest)<br/>question 2-2000 chars, optional clarification<br/>invalid -> HTTP 422"]
+    EP --> CORS --> VAL --> PIIS
+  end
+
+  subgraph ORCH["Pipeline.handle (app/orchestrator.py), hard deadline 40 s"]
+    direction TB
+    REF["Resources.refresh_if_stale"]
+    COMP["compose_question<br/>question + clarification reply"]
+    MASK["PII masking: PIIMasker.mask<br/>rules: phone, national_id, iban, email (regex),<br/>names (trigger words + common_names.txt)<br/>+ CAMeLBERT-da names if PII_NAME_MODEL=camelbert-da"]
+    PH["Masked question with placeholders [شخص_1]<br/>originals kept only in RequestCtx.pii_values"]
+    UND["Stage 2: understand (app/stages/understand.py)<br/>prompt understand.md + glossary hints<br/>-> domain, confidence, msa_rewrite, legal_rewrite,<br/>legal_issues, missing_facts, risk_level<br/>failure -> fallback: domain other"]
+    GATE["Stage 3: decide_gate (app/stages/gate.py)<br/>rules app/rules/gate_rules.yaml"]
+    REF --> COMP --> MASK --> PH --> UND --> GATE
+  end
+
+  subgraph STOPS["Early responses"]
+    direction TB
+    OOS["out_of_scope<br/>not a legal question"]
+    REFR["referral<br/>risk high or referral keyword"]
+    CLAR["clarification<br/>blocking missing fact, first round only"]
+  end
+
+  subgraph RET["Stage 4: Retriever.get_articles (app/stages/retrieve.py)"]
+    direction TB
+    FOCUS["Domain check<br/>focus domain and confidence >= 0.6?"]
+    PACK["Path 'pack': whole law of the domain<br/>in-force articles, definitions first<br/>(if <= 180,000 chars)"]
+    PSEARCH["Path 'pack_search': search inside the domain<br/>(law too big; none today)"]
+    WORD["Path 'search': 3 wordings<br/>original, msa_rewrite, legal_rewrite"]
+    EMBQ["Embed wordings<br/>NOT ACTIVE (no OpenAI key) -> keyword only"]
+    HS["Store.hybrid_search per wording (parallel)<br/>LocalStore: BM25 over chunks (+ vectors if present)"]
+    RRF["rrf_merge k=60 by article<br/>top 40, in-force only"]
+    RR["Rerank (Cohere)<br/>NOT ACTIVE (no key) -> keep RRF order, top 20"]
+    EXP["Add definitions articles (max 5)"]
+    FOCUS -- yes --> PACK
+    FOCUS -- "yes, too big" --> PSEARCH
+    FOCUS -- no --> WORD --> EMBQ --> HS --> RRF --> RR --> EXP
+    PSEARCH --> WORD
+  end
+
+  CTX["Context construction: generate.build_messages<br/>&lt;article id law number year article_no last_amended&gt; blocks<br/>+ masked question + Standard Arabic version + legal issues<br/>-> continues in diagram 03"]
+  NOS["no_support<br/>no articles found"]
+
+  subgraph GW["ModelGateway (app/gateway/client.py)"]
+    GUARD["Leak guard _guard<br/>blocks the call if any detected personal value<br/>appears in outgoing text (law text excluded)"]
+  end
+
+  subgraph EXTP["External providers"]
+    direction TB
+    DS["DeepSeek API<br/>deepseek-flash, thinking off"]
+    OAI["OpenAI embeddings<br/>NOT CONFIGURED"]
+    COH["Cohere rerank<br/>NOT CONFIGURED"]
+  end
+
+  UI -- "HTTPS JSON" --> EP
+  PIIS --> REF
+  UND -- "chat_json(understand)" --> GUARD
+  EMBQ -. "embed()" .-> GUARD
+  RR -. "rerank()" .-> GUARD
+  GUARD --> DS
+  GUARD -.-> OAI
+  GUARD -.-> COH
+  GATE -- out_of_scope --> OOS
+  GATE -- referral --> REFR
+  GATE -- clarify --> CLAR
+  GATE -- continue --> FOCUS
+  PACK --> CTX
+  EXP --> CTX
+  RRF -- "nothing found" --> NOS
+
+  classDef done fill:#e3f4e8,stroke:#2e7d4f,color:#14321f
+  classDef partial fill:#fff4dc,stroke:#b07d10,color:#4a3405
+  classDef planned fill:#f6f6f6,stroke:#999,color:#555,stroke-dasharray:5 4
+  classDef partner fill:#e6eefb,stroke:#3a63b0,color:#132a55
+  classDef ext fill:#f4f4f4,stroke:#777,color:#222
+  classDef stop fill:#fdf0e6,stroke:#c46a1b,color:#4a2508
+  class EP,PIIS,VAL,REF,COMP,PH,UND,GATE,FOCUS,PACK,CTX,GUARD done
+  class MASK,WORD,HS,RRF,EXP,PSEARCH,CORS partial
+  class EMBQ,RR,OAI,COH planned
+  class UI partner
+  class DS ext
+  class OOS,REFR,CLAR,NOS stop

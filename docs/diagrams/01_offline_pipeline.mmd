@@ -1,0 +1,68 @@
+flowchart LR
+  %% A. Offline pipeline: how legal data is prepared and reaches the backend
+  subgraph S["Sources"]
+    direction TB
+    LOB["lob.gov.jo<br/>Legislation and Opinion Bureau<br/>(source of all 4 current laws)"]
+    JOL["Jolaws or other sources<br/>NEEDS CONFIRMATION<br/>(no such data in the repository)"]
+  end
+
+  subgraph DT["Data Team (owned; code not in this repository)"]
+    direction TB
+    SCRAPE["Scraping and extraction<br/>law page + articles"]
+    PARSE["Parsing<br/>title, number, year, status,<br/>gazette, references, chapters"]
+    OUT["Scraper JSON, one file per law<br/>schema_version, law_id, title_ar,<br/>status_as_displayed_ar, articles[number,<br/>position, text_ar, chapter_ar, source_url]"]
+    DB["PLANNED: Supabase Postgres + pgvector<br/>legislation, articles, chunks, domain_packs,<br/>glossary, relations, data_versions"]
+    EMB["PLANNED: embeddings<br/>text-embedding-3-large, 1024 dims"]
+    SQL["PLANNED: hybrid_search() SQL function<br/>(sql/hybrid_search_contract.sql)"]
+    SCRAPE --> PARSE --> OUT
+    OUT -. "after integration" .-> DB
+    DB -.-> EMB
+    DB -.-> SQL
+  end
+
+  subgraph BK["Backend: prepared at startup (this repository)"]
+    direction TB
+    FILES["data/dev/lob-2-*.json<br/>4 laws, read-only, git-ignored"]
+    DOM["app/db/local_domains.yaml<br/>law_id -> focus domain (hand-written)"]
+    LOAD["LocalStore load<br/>status map (fail closed), article id law_id:number,<br/>repealed = text only 'ملغاة', definitions article"]
+    CHUNK["Chunking<br/>split_into_chunks, max 1,200 chars,<br/>header + piece"]
+    BM["Keyword index (in memory)<br/>BM25 k1 1.5 b 0.75, light_stem, normalize"]
+    VEC["Optional vectors<br/>data/dev/embeddings/*.jsonl<br/>NOT GENERATED (no OpenAI key)"]
+    QR["Quality report<br/>scripts/inspect_corpus.py"]
+    VER["Data version<br/>local-&lt;sha256 of files&gt;"]
+    RES["Resources.load<br/>domain packs (in force, definitions first),<br/>glossary (no glossary.csv yet), refresh every 300 s"]
+    FILES --> LOAD
+    DOM --> LOAD
+    LOAD --> CHUNK --> BM
+    VEC -.-> BM
+    LOAD --> QR
+    LOAD --> VER
+    LOAD --> RES
+  end
+
+  subgraph BOUND["OFFLINE / ONLINE boundary"]
+    STORE["Store interface (app/db/store.py)<br/>get_articles, load_domain_packs, hybrid_search,<br/>definitions_for, load_glossary,<br/>latest_data_version, insert_trace, ping"]
+    SUPA["SupabaseStore<br/>implemented, NOT tested against a real database"]
+  end
+
+  ONLINE["Online pipeline<br/>(see 02 and 03)"]
+
+  LOB --> SCRAPE
+  JOL -.-> SCRAPE
+  OUT -- "files copied manually" --> FILES
+  RES --> STORE
+  BM --> STORE
+  SQL -.-> SUPA
+  SUPA -. "STORE_BACKEND=supabase" .-> STORE
+  STORE --> ONLINE
+
+  classDef done fill:#e3f4e8,stroke:#2e7d4f,color:#14321f
+  classDef partial fill:#fff4dc,stroke:#b07d10,color:#4a3405
+  classDef planned fill:#f6f6f6,stroke:#999,color:#555,stroke-dasharray:5 4
+  classDef partner fill:#e6eefb,stroke:#3a63b0,color:#132a55
+  classDef confirm fill:#fde8e8,stroke:#b03a3a,color:#4a1212,stroke-dasharray:3 3
+  class FILES,DOM,LOAD,CHUNK,BM,QR,VER,RES,STORE,ONLINE done
+  class SUPA partial
+  class DB,EMB,SQL,VEC planned
+  class LOB,SCRAPE,PARSE,OUT partner
+  class JOL confirm

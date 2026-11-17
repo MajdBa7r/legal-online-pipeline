@@ -1,0 +1,40 @@
+flowchart LR
+  %% System overview: offline data preparation -> online question answering -> website
+  subgraph OFF["OFFLINE: data preparation (before any user question)"]
+    direction TB
+    SRC["Official source<br/>lob.gov.jo (Legislation and Opinion Bureau)"]
+    SCR["Data Team scraper<br/>(code not in this repository)"]
+    JSON["One JSON file per law<br/>law_id lob-2-&lt;id&gt;"]
+    SRC --> SCR --> JSON
+  end
+
+  subgraph LOAD["BACKEND STARTUP: load into memory"]
+    direction TB
+    LS["LocalStore (app/db/local_store.py)<br/>articles, chunks, BM25 index, data version"]
+    RES["Resources (app/resources.py)<br/>domain packs, glossary, prompts, gate rules"]
+    LS --> RES
+  end
+
+  subgraph ON["ONLINE: one question, 40 s hard limit"]
+    direction TB
+    API["FastAPI /api/ask (app/main.py)"]
+    PIPE["Pipeline (app/orchestrator.py)<br/>mask - understand - gate - retrieve -<br/>generate - verify - decide"]
+    API --> PIPE
+  end
+
+  WEB["Website (Web Team)<br/>question box, answer, citations, status"]
+  EXT["External AI providers<br/>DeepSeek, Moonshot Kimi"]
+
+  JSON -- "copied into data/dev (manual)" --> LS
+  RES --> PIPE
+  WEB -- "POST /api/ask (JSON)" --> API
+  PIPE -- "AskResponse JSON" --> WEB
+  PIPE -- "masked text only, via leak guard" --> EXT
+  EXT -- "JSON replies" --> PIPE
+
+  classDef done fill:#e3f4e8,stroke:#2e7d4f,color:#14321f
+  classDef partner fill:#e6eefb,stroke:#3a63b0,color:#132a55
+  classDef ext fill:#f4f4f4,stroke:#777,color:#222
+  class LS,RES,API,PIPE done
+  class SRC,SCR,JSON,WEB partner
+  class EXT ext

@@ -1,0 +1,67 @@
+flowchart LR
+  %% C. Team integration: who owns what, and the interfaces between the teams
+  subgraph DT["Data Team"]
+    direction TB
+    D1["Scraper and parsing<br/>(lob.gov.jo)"]
+    D2["Legal data: laws, articles, metadata,<br/>status, amendments, gazette"]
+    D3["PLANNED: Supabase database<br/>tables, chunks, embeddings,<br/>hybrid_search(), data_versions"]
+    D1 --> D2 --> D3
+  end
+
+  subgraph I1["Interface: Data -> Backend"]
+    direction TB
+    F1["NOW: scraper JSON files<br/>copied into data/dev (one per law)"]
+    F2["LATER: Store interface over Supabase<br/>app/db/schema_map.py,<br/>sql/hybrid_search_contract.sql,<br/>sql/traces_table.sql"]
+    A1["TO AGREE (HANDOFF_DATA_TEAM.md section 6):<br/>stable article ids, domain assignment,<br/>status and repeal marking, text cleaning,<br/>amendment years, embeddings, glossary,<br/>data versions, database access"]
+  end
+
+  subgraph BE["Backend Team (this repository)"]
+    direction TB
+    B1["LocalStore / SupabaseStore"]
+    B2["PII protection<br/>rules + CAMeLBERT-da + leak guard"]
+    B3["Pipeline: understand, gate, retrieve,<br/>generate, verify, decide"]
+    B4["Citations from store articles,<br/>verification status, abstention"]
+    B5["FastAPI: /api/ask, /api/article/{id},<br/>/api/health"]
+    B1 --> B3
+    B2 --> B3 --> B4 --> B5
+  end
+
+  subgraph I2["Interface: Backend -> Web"]
+    direction TB
+    W1["HTTP JSON API + optional SSE stream<br/>AskResponse schema (app/schemas/api.py)<br/>docs/HANDOFF_WEB_TEAM.md,<br/>docs/sample_responses/*.json"]
+    W2["CORS_ORIGINS setting<br/>(empty = same origin only)"]
+    A2["TO AGREE (HANDOFF_WEB_TEAM.md):<br/>base URL and hosting origin,<br/>authentication, per-user rate limit"]
+  end
+
+  subgraph WT["Web Team"]
+    direction TB
+    U1["Question input + privacy notice"]
+    U2["Render display_text and quote,<br/>verification badge, caveats, sections"]
+    U3["Clarification round,<br/>referral, abstention, error messages"]
+    U1 --> U2 --> U3
+  end
+
+  LEG["Legal members<br/>own app/rules/gate_rules.yaml<br/>(referral keywords, thresholds)"]
+  PROV["External AI providers<br/>DeepSeek (understand, generate)<br/>Moonshot Kimi K2.6 (verify)"]
+
+  D2 --> F1 --> B1
+  D3 -.-> F2 -.-> B1
+  A1 -.- F2
+  B5 --> W1 --> U1
+  W2 -.- W1
+  A2 -.- W1
+  LEG -.-> B3
+  B3 <--> PROV
+
+  classDef done fill:#e3f4e8,stroke:#2e7d4f,color:#14321f
+  classDef partial fill:#fff4dc,stroke:#b07d10,color:#4a3405
+  classDef planned fill:#f6f6f6,stroke:#999,color:#555,stroke-dasharray:5 4
+  classDef partner fill:#e6eefb,stroke:#3a63b0,color:#132a55
+  classDef agree fill:#fde8e8,stroke:#b03a3a,color:#4a1212
+  classDef ext fill:#f4f4f4,stroke:#777,color:#222
+  class B1,B3,B4,B5,F1,W1,W2 done
+  class B2 partial
+  class D3,F2 planned
+  class D1,D2,U1,U2,U3,LEG partner
+  class A1,A2 agree
+  class PROV ext

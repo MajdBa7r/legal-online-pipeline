@@ -1,0 +1,97 @@
+flowchart LR
+  %% B2. Online pipeline, part 2: from the legal context to the rendered answer (continues from 02)
+  CTX["Context from diagram 02<br/>articles + masked question"]
+
+  subgraph GEN["Stage 5: generate (app/stages/generate.py)"]
+    direction TB
+    CALL["chat_json('generate')<br/>prompt generate.md, JSON mode,<br/>temperature 0.2, max 3,000 tokens, 20 s"]
+    PARSE["extract_json<br/>code fences, split objects merged<br/>(no duplicate keys)"]
+    LREP["Local repair: escape_inner_quotes<br/>(content kept exactly, no model call)"]
+    MREP["One model repair: REPAIR_PROMPT<br/>with the position where JSON broke"]
+    ANS["GeneratedAnswer<br/>status, summary, caveats,<br/>claims: id, text, article_id, quote, essential"]
+    CALL --> PARSE
+    PARSE -- valid --> ANS
+    PARSE -- invalid --> LREP
+    LREP -- valid --> ANS
+    LREP -- invalid --> MREP
+    MREP -- valid --> ANS
+  end
+
+  subgraph VER["Stage 6: verify (app/stages/verify.py)"]
+    direction TB
+    CODE["code_checks per claim<br/>article supplied, exact quote,<br/>numbers in article, in force"]
+    ALC["answer_level_checks<br/>numbers in summary and caveats<br/>must come from question or cited articles"]
+    SEM["Semantic check: chat_json('verify')<br/>each cited article once + claims + summary<br/>one verdict per claim id and for 'summary'<br/>prompt verify.md, 18 s"]
+    REP["VerificationReport<br/>failures, summary_verdict, semantic_skipped"]
+    CODE --> SEM
+    ALC --> REP
+    SEM -- "verdicts" --> REP
+    SEM -- "timeout or error -> semantic_skipped" --> REP
+  end
+
+  subgraph DEC["Stage 7: decide (app/stages/decide.py)"]
+    direction TB
+    ALL["Check: all claims and checks passed?"]
+    RW["Check: rewrite allowed?<br/>attempt 1 and time left >= max(15 s,<br/>1.25 x (generate + verify) + 1.5 s)"]
+    ESS["Check: abstain?<br/>essential claim failed or<br/>more than 50% of claims failed"]
+    DROP["Drop failed non-essential claims<br/>answer marked partial"]
+    SUM["Summary shown only if verdict 'supported',<br/>else neutral sentence"]
+    ALL -- no --> RW
+    RW -- no --> ESS
+    ESS -- no --> DROP --> SUM
+    ALL -- yes --> SUM
+  end
+
+  subgraph OUT["Response (app/orchestrator.py)"]
+    direction TB
+    CIT["_answer_out: ClaimOut per claim<br/>citation.label from the LocalStore article<br/>display_text = text + (label)"]
+    STAT["verification = verified or<br/>not_semantically_verified (checker did not run)"]
+    REST["_restore: placeholders back to the user's values"]
+    RESP["AskResponse JSON<br/>type answer, clarification, referral,<br/>no_support, out_of_scope, error"]
+    TR["insert_trace (background)<br/>logs/traces.jsonl, no question text"]
+    CIT --> STAT --> REST --> RESP
+    RESP --> TR
+  end
+
+  subgraph ENDS["Other final outcomes"]
+    direction TB
+    UNV["no_support (abstain)<br/>message UNVERIFIED"]
+    REFL["referral<br/>generator status needs_lawyer"]
+    ERR["error<br/>invalid JSON after repair, time-out,<br/>leak guard block, retrieval failure"]
+  end
+
+  subgraph GW["ModelGateway"]
+    GUARD["Leak guard _guard<br/>before every external call"]
+  end
+  DS["DeepSeek API<br/>deepseek-flash"]
+  KIMI["Moonshot API<br/>kimi-k2.6, thinking off"]
+  UI["Website (Web Team)<br/>display_text + quote, verification badge,<br/>caveats, clarification input, messages,<br/>privacy notice"]
+
+  CTX --> CALL
+  CALL --> GUARD
+  MREP --> GUARD
+  SEM --> GUARD
+  GUARD -- generate --> DS
+  GUARD -- verify --> KIMI
+  MREP -- invalid --> ERR
+  ANS --> CODE
+  ANS --> ALC
+  REP --> ALL
+  RW -- "yes: rewrite with feedback" --> CALL
+  ESS -- yes --> UNV
+  SUM --> CIT
+  SUM -. "status needs_lawyer" .-> REFL
+  RESP -- "HTTP 200 JSON or SSE 'result'" --> UI
+  UNV --> RESP
+  REFL --> RESP
+  ERR --> RESP
+
+  classDef done fill:#e3f4e8,stroke:#2e7d4f,color:#14321f
+  classDef partial fill:#fff4dc,stroke:#b07d10,color:#4a3405
+  classDef partner fill:#e6eefb,stroke:#3a63b0,color:#132a55
+  classDef ext fill:#f4f4f4,stroke:#777,color:#222
+  classDef stop fill:#fdf0e6,stroke:#c46a1b,color:#4a2508
+  class CTX,CALL,PARSE,LREP,MREP,ANS,CODE,ALC,SEM,REP,ALL,RW,ESS,DROP,SUM,CIT,STAT,REST,RESP,TR,GUARD done
+  class UI partner
+  class DS,KIMI ext
+  class UNV,REFL,ERR stop
