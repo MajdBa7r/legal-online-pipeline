@@ -109,7 +109,19 @@ def _words_to_numbers(text: str) -> set[float]:
     return found
 
 
-def extract_numbers(text: str) -> set[float]:
+def _joined_duals(norm: str) -> set[float]:
+    """Source-text defect: a missing space glues "ال"+dual onto the previous word ("وانقضتالسنتان", Labour Law
+    Art. 61). Only "ال"+dual at the END of a longer word counts. Used for ARTICLE text only, never for claims."""
+    out: set[float] = set()
+    for tok in _WORD.findall(norm):
+        for dual, val in DUALS.items():
+            tail = "ال" + dual
+            if tok.endswith(tail) and len(tok) > len(tail) + 1:
+                out.add(val)
+    return out
+
+
+def extract_numbers(text: str, *, joined_words: bool = False) -> set[float]:
     clean = _PLACEHOLDER.sub(" ", text)
     norm = normalize(clean)
     out: set[float] = set()
@@ -121,12 +133,14 @@ def extract_numbers(text: str) -> set[float]:
         else:
             out.add(float(raw.replace("٫", ".").replace(",", ".")))
     out |= _words_to_numbers(norm)
+    if joined_words:
+        out |= _joined_duals(norm)
     return out
 
 
 def numbers_supported(claim_text: str, article_text: str, allowed: set[float] | None = None) -> tuple[bool, list[float]]:
     """Every number in the claim must appear in the article (or in its metadata: article no., law no., year)."""
     claim_nums = extract_numbers(claim_text)
-    article_nums = extract_numbers(article_text) | (allowed or set())
+    article_nums = extract_numbers(article_text, joined_words=True) | (allowed or set())
     missing = sorted(n for n in claim_nums if not any(abs(n - a) < 1e-9 for a in article_nums))
     return (not missing), missing

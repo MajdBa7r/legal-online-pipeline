@@ -31,10 +31,17 @@ class ClaimCheck:
         return not self.failures and self.semantic in (None, "supported")
 
 
+SUMMARY_ID = "summary"   # id of the summary item in the checker request (claim ids are c1, c2, ...)
+
+
 @dataclass
 class VerificationReport:
     checks: dict[str, ClaimCheck]
     semantic_skipped: bool = False
+    # checker verdict on the summary: "supported" | "partial" | "unsupported" | None (not checked / no verdict).
+    # Anything but "supported" means the summary is replaced by a neutral sentence (app/stages/decide.py).
+    summary_verdict: str | None = None
+    summary_reason: str = ""
     # answer-level problems as (part, message); part is "summary" or "caveat:<index>"
     answer_failures: list[tuple[str, str]] = field(default_factory=list)
 
@@ -93,14 +100,24 @@ def code_checks(claim: Claim, supplied: dict[str, Article], settings: Settings) 
     return chk
 
 
-def _semantic_messages(items: list[tuple[Claim, Article]], res: Resources) -> list[dict]:
-    payload = [
-        {"id": c.id, "claim": c.text, "quote": c.quote, "article": f"<article id=\"{a.id}\">{a.text}</article>"}
-        for c, a in items
-    ]
+def _semantic_messages(items: list[tuple[Claim, Article]], res: Resources, summary: str = "",
+                       question: str = "") -> list[dict]:
+    """One request: every UNIQUE article once, then each claim pointing to its article by id, then the summary.
+
+    Each claim still gets its own verdict against its own article (see app/prompts/verify.md)."""
+    articles: dict[str, Article] = {}
+    for _, a in items:
+        articles.setdefault(a.id, a)
+    payload: dict = {
+        "articles": [{"id": a.id, "text": f"<article id=\"{a.id}\">{a.text}</article>"} for a in articles.values()],
+        "claims": [{"id": c.id, "article_id": a.id, "claim": c.text, "quote": c.quote} for c, a in items],
+    }
+    if summary.strip():
+        payload["summary"] = {"id": SUMMARY_ID, "question": question, "text": summary,
+                              "claim_ids": [c.id for c, _ in items]}
     return [
         {"role": "system", "content": res.prompts.verify},
-        {"role": "user", "content": json.dumps({"claims": payload}, ensure_ascii=False)},
+        {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
     ]
 
 
@@ -137,8 +154,11 @@ async def verify(answer: GeneratedAnswer, articles: list[Article], gw: ModelGate
     if not to_semantic:
         return report
     try:
-        out = await gw.chat_json("verify", _semantic_messages(to_semantic, res), VerifierOutput, ctx)
+        out = await gw.chat_json("verify", _semantic_messages(to_semantic, res, answer.summary, question),
+                                 VerifierOutput, ctx)
         verdicts = {v.id: v for v in out.verdicts}
+        if (sv := verdicts.get(SUMMARY_ID)) is not None:
+            report.summary_verdict, report.summary_reason = sv.verdict, sv.reason
         for claim, _ in to_semantic:
             v = verdicts.get(claim.id)
             chk = checks[claim.id]

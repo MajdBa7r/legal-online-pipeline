@@ -77,6 +77,9 @@ Running the real model locally (optional, not needed for the default setup):
     PII_REAL_MODEL=1 python -m pytest tests/test_name_model_real.py -v
     python scripts/eval_pii.py --configs all --save              # development set, four configurations
 
+Rules-only vs rules + CAMeLBERT on the labelled cases, the 301 law articles (false positives on legal text) and
+the regression inputs, with time and memory: `python scripts/eval_pii_camelbert.py`.
+
 Tests that use a fake model (`test_name_model_camelbert.py`) or a tiny random local model
 (`test_name_model_hf_plumbing.py`) check our code only; they say nothing about the real model's accuracy.
 
@@ -132,7 +135,10 @@ Sample responses for the website team are in `docs/sample_responses/`.
   `min(role timeout, time left - reserve)`, each call is capped as a whole, and a rewrite starts only if
   `1.25 x (this request's generate + verify time) + reserve` is left. A failed essential claim makes the answer
   abstain (`no_support` with the UNVERIFIED message) instead of being dropped; non-essential failed claims are
-  dropped and the answer is marked partial.
+  dropped and the answer is marked partial. The checker gets each cited article once and gives one verdict per
+claim, plus one for the summary (a summary that is not "supported" is replaced by a neutral sentence). If the
+checker cannot run, only claims that passed every code check are shown, with the neutral summary and
+`answer.verification = "not_semantically_verified"`. Frontend contract: `docs/HANDOFF_WEB_TEAM.md`.
 - Nothing personal is sent or logged: the gateway blocks any call whose user text still contains a masked
   value; traces store IDs, timings and counts only.
 

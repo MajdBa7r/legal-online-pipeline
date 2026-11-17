@@ -51,7 +51,7 @@ roles:
     model: kimi-k2.6                  # confirmed via /models on 2026-11-17; 6.6 s for 5 claims
     temperature: null                 # kimi-k2.6 fixes temperature (0.6 with thinking off); do not send it
     max_tokens: 1500
-    timeout_s: 12
+    timeout_s: 18                     # 12 s timed out 3x on 2026-11-17 (output-bound); the 40 s deadline still caps it
     json_mode: true
     extra_body: {thinking: {type: disabled}}
     fallback: null

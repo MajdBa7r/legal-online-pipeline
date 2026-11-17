@@ -33,8 +33,48 @@ _ARTICLE_BLOCK = re.compile(r"<article\b.*?</article>", re.DOTALL)
 RETRYABLE_STATUS ={408, 409, 425, 429, 500, 502, 503, 504}
 REPAIR_PROMPT = (
     "Your previous reply was not valid JSON for the required schema. Error: {error}\n"
-    "Reply again with ONLY the corrected JSON object, no prose and no code fences."
+    "{where}"
+    "The usual cause is a double quote character inside a text value: never use the ASCII double quote inside text;"
+    " use « » instead. Reply again with ONLY the corrected JSON object, no prose and no code fences."
 )
+
+
+def escape_inner_quotes(raw: str) -> str:
+    """Deterministic first repair: escape ASCII double quotes that sit INSIDE a string value.
+
+    Inside a string, a quote counts as closing only if the next non-space character is one of : , } ]
+    (or the end); any other quote is escaped. Content is kept exactly (escaping, not replacing), so a claim whose
+    quote contained a stray quote still has to match the article text in the code checks."""
+    out, in_str, i, n = [], False, 0, len(raw)
+    while i < n:
+        ch = raw[i]
+        if in_str and ch == "\\":
+            out.append(raw[i:i + 2])
+            i += 2
+            continue
+        if ch == '"':
+            if not in_str:
+                in_str = True
+            else:
+                j = i + 1
+                while j < n and raw[j] in " \t\r\n":
+                    j += 1
+                if j >= n or raw[j] in ":,}]":
+                    in_str = False
+                else:
+                    out.append('\\"')
+                    i += 1
+                    continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _where(raw: str, e: Exception) -> str:
+    pos = getattr(e, "pos", None)
+    if pos is None:
+        return ""
+    return f"The JSON breaks near character {pos}: ...{raw[max(0, pos - 60):pos + 20]}...\n"
 
 
 @dataclass
@@ -65,11 +105,42 @@ def extract_json(raw: str) -> Any:
         text = fence.group(1)
     try:
         return json.loads(text)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as first_error:
+        if (merged := _merge_split_objects(text)) is not None:
+            return merged
         start, end = text.find("{"), text.rfind("}")
         if start != -1 and end > start:
-            return json.loads(text[start : end + 1])
-        raise
+            try:
+                return json.loads(text[start : end + 1])
+            except json.JSONDecodeError:
+                pass
+        raise first_error
+
+
+def _merge_split_objects(text: str) -> dict | None:
+    """A reply split into several complete JSON objects ({"summary": ...} then {"sections": ...}).
+    Merged only when every part is an object and no key appears twice; otherwise None (not guessed)."""
+    dec, i, parts = json.JSONDecoder(), 0, []
+    while i < len(text):
+        while i < len(text) and text[i] in " \t\r\n,":
+            i += 1
+        if i >= len(text):
+            break
+        try:
+            obj, i = dec.raw_decode(text, i)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(obj, dict):
+            return None
+        parts.append(obj)
+    if len(parts) < 2:
+        return None
+    merged: dict = {}
+    for p in parts:
+        if set(p) & set(merged):
+            return None
+        merged.update(p)
+    return merged
 
 
 class ModelGateway:
@@ -199,9 +270,17 @@ class ModelGateway:
             return schema.model_validate(extract_json(raw))
         except (ValidationError, ValueError) as e:
             ctx.trace.add_call(ModelCall(cfg.role, cfg.model, 0, "invalid_json"))
-            repair = messages + [
+            # model output holds masked text only (the guard checked the input); log a short snippet to diagnose
+            log.warning("role=%s invalid JSON (%s) near: %s", cfg.role, str(e)[:120], _where(raw, e)[:200])
+            try:                                   # 1) deterministic local repair, no extra model call
+                fixed = schema.model_validate(extract_json(escape_inner_quotes(raw)))
+                ctx.trace.add_call(ModelCall(cfg.role, cfg.model, 0, "repaired_locally"))
+                return fixed
+            except (ValidationError, ValueError):
+                pass
+            repair = messages + [                  # 2) one model repair, told where it broke
                 {"role": "assistant", "content": raw},
-                {"role": "user", "content": REPAIR_PROMPT.format(error=str(e)[:800])},
+                {"role": "user", "content": REPAIR_PROMPT.format(error=str(e)[:400], where=_where(raw, e))},
             ]
             raw2 = await self._chat(cfg, repair, ctx)
             try:

@@ -50,7 +50,10 @@ class Pipeline:
         mask: MaskResult | None = None
         try:
             with ctx.trace.stage("mask"):
-                mask = self.masker.mask(compose_question(req))
+                if self.masker.name_model is None:      # rules only: fast, exactly as before
+                    mask = self.masker.mask(compose_question(req))
+                else:                                   # CPU model: run off the event loop
+                    mask = await asyncio.to_thread(self.masker.mask, compose_question(req))
             ctx.pii_values = mask.originals
             ctx.trace.set(pii_count=len(mask.mapping), clarification_round=req.clarification is not None)
 
@@ -127,9 +130,10 @@ class Pipeline:
             except (ModelCallError, ModelOutputError) as e:
                 log.warning("generation attempt %d failed: %s", attempt, e)
                 ctx.trace.set(generations=attempt)
-                if first is None:
-                    ctx.trace.set(outcome="timeout")
-                    return self._simple(ctx, "error", M.TIMEOUT, domain=gate.domain)
+                if first is None:       # structured error: time-out message only for an actual time-out
+                    timed_out = isinstance(e, ModelCallError)
+                    ctx.trace.set(outcome="timeout" if timed_out else "generation_invalid_output")
+                    return self._simple(ctx, "error", M.TIMEOUT if timed_out else M.ERROR, domain=gate.domain)
                 # the rewrite failed: decide on the first answer, with no further rewrite
                 decision = decide(first[0], first[1], u, 2, 0.0, float("inf"), articles)
                 ctx.trace.set(rewrite_failed=True)
@@ -146,7 +150,8 @@ class Pipeline:
             retry_min = self.retry_needed_s(gen_s, ver_s)
             decision = decide(ans, report, u, attempt, ctx.deadline.remaining(), retry_min, articles)
             ctx.trace.set(generations=attempt, verification=report.counts(),
-                          semantic_skipped=report.semantic_skipped, retry_min_s=round(retry_min, 1))
+                          semantic_skipped=report.semantic_skipped, retry_min_s=round(retry_min, 1),
+                          summary_verdict=report.summary_verdict)
             if decision.kind != "retry":
                 break
             first = (ans, report)
@@ -180,8 +185,11 @@ class Pipeline:
             items = []
             for c in getattr(d.answer.sections, name):
                 art = by_id.get(c.article_id)
-                items.append(ClaimOut(text=c.text, citation=Citation(
-                    article_id=c.article_id, quote=c.quote, label=art.label() if art else c.article_id)))
+                if art is None:        # cannot happen: such claims fail the code checks; never show them uncited
+                    continue
+                label = art.label()
+                items.append(ClaimOut(text=c.text, display_text=f"{c.text} ({label})", citation=Citation(
+                    article_id=c.article_id, quote=c.quote, label=label)))
             setattr(sections, name, items)
         caveats = list(d.answer.caveats)
         if d.partial:
@@ -191,7 +199,8 @@ class Pipeline:
         if d.force_initial_label:
             caveats.append(M.SEMANTIC_SKIPPED_NOTE)
         return AnswerOut(summary=d.answer.summary, sections=sections, caveats=caveats,
-                         partial=d.partial, amendment_warning=d.amendment_warning)
+                         partial=d.partial, amendment_warning=d.amendment_warning,
+                         verification="not_semantically_verified" if d.force_initial_label else "verified")
 
     def _version(self) -> str | None:
         return self.res.data_version.version if self.res.data_version else None
@@ -219,4 +228,5 @@ class Pipeline:
             for name in SECTION_NAMES:
                 for item in getattr(out.answer.sections, name):
                     item.text = r(item.text, mask.mapping)
+                    item.display_text = r(item.display_text, mask.mapping)
         return out

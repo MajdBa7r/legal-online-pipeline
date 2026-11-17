@@ -8,6 +8,11 @@ Safety rules for the final answer:
   incomplete or misleading.
 * A summary or caveat that failed the answer-level number check is never shown: the summary is replaced by a
   neutral sentence and the caveat is removed. Dropped claims are announced with PARTIAL_NOTE, never silently.
+* The summary is shown only if the checker returned "supported" for it; otherwise (partial, unsupported, no
+  verdict, or the checker could not run) it is replaced by the neutral sentence.
+* Checker unavailable (timeout, rate limit, error): an answer is still delivered only with claims that passed every
+  code check (article supplied, exact quote, numbers), with no essential claim failed, with the neutral summary,
+  and marked NOT semantically verified (force_initial_label -> API answer.verification). Otherwise it abstains.
 """
 from __future__ import annotations
 
@@ -51,12 +56,13 @@ def _amendment_warning(answer: GeneratedAnswer, u: Understanding, supplied: dict
 
 
 def _without_failed_text(answer: GeneratedAnswer, report: VerificationReport) -> GeneratedAnswer:
-    """Remove a summary or caveat that failed the answer-level check (never show unchecked numbers)."""
+    """Never show an unverified summary or a caveat that failed the answer-level number check."""
     parts = {p for p, _ in report.answer_failures}
-    if not parts:
+    summary_ok = "summary" not in parts and report.summary_verdict == "supported"
+    if not parts and summary_ok:
         return answer
     out = answer.model_copy(deep=True)
-    if "summary" in parts:
+    if not summary_ok:
         out.summary = M.NEUTRAL_SUMMARY
     out.caveats = [c for i, c in enumerate(answer.caveats) if f"caveat:{i}" not in parts]
     return out
@@ -76,7 +82,7 @@ def decide(answer: GeneratedAnswer, report: VerificationReport, u: Understanding
         return Decision("no_support", reasons=["semantic check unavailable"])
 
     if report.all_passed():
-        return Decision("referral" if lawyer else "deliver", answer=answer,
+        return Decision("referral" if lawyer else "deliver", answer=_without_failed_text(answer, report),
                         amendment_warning=_amendment_warning(answer, u, supplied),
                         force_initial_label=report.semantic_skipped)
 

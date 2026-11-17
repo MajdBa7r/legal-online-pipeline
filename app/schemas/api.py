@@ -30,6 +30,9 @@ class Citation(BaseModel):
 class ClaimOut(BaseModel):
     text: str
     citation: Citation
+    # the claim with its citation inline, ready to display: "<text> (<law title>، المادة <n>)".
+    # Built from the LocalStore article, never from model text.
+    display_text: str = ""
 
 
 class AnswerSections(BaseModel):
@@ -45,6 +48,10 @@ class AnswerOut(BaseModel):
     caveats: list[str] = Field(default_factory=list)
     partial: bool = False
     amendment_warning: bool = False
+    # "verified": every shown claim passed the code checks AND the semantic check.
+    # "not_semantically_verified": the semantic checker could not run; shown claims passed the code checks only
+    # (real article, exact quote, numbers). The website must show this status visibly.
+    verification: Literal["verified", "not_semantically_verified"] = "verified"
 
 
 class Referral(BaseModel):

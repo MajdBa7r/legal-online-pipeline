@@ -156,3 +156,52 @@ def test_no_call_starts_without_enough_budget():
     tight = RequestCtx(deadline=Deadline(1.0))   # 1.0 - reserve 1.5 < min_call 2.0
     with pytest.raises(ModelCallError):
         asyncio.run(gw.chat_json("verify", [{"role": "user", "content": "x"}], VerifierOutput, tight))
+
+
+# ---- broken JSON: controlled two-stage repair -----------------------------------------------------------
+from app.errors import ModelOutputError  # noqa: E402
+from app.gateway.client import escape_inner_quotes  # noqa: E402
+
+
+def test_escape_inner_quotes_keeps_content_and_structure():
+    raw = '{"verdicts": [{"id": "c1", "verdict": "partial", "reason": "كلمة "المالك" ناقصة"}]}'
+    fixed = json.loads(escape_inner_quotes(raw))
+    assert fixed["verdicts"][0]["reason"] == 'كلمة "المالك" ناقصة'          # exact content, quotes kept
+    good = '{"a": "x", "b": ["y", "z"], "c": {"d": "e"}}'
+    assert escape_inner_quotes(good) == good                                  # valid JSON untouched
+
+
+def test_inner_quote_is_repaired_locally_without_a_second_call():
+    calls = {"n": 0}
+    broken = '{"verdicts": [{"id": "c1", "verdict": "partial", "reason": "كلمة "المالك" ناقصة"}]}'
+
+    def handler(req):
+        calls["n"] += 1
+        return httpx.Response(200, json=chat_reply(broken))
+
+    out = asyncio.run(make_gw(handler).chat_json("verify", [{"role": "user", "content": "x"}], VerifierOutput, ctx()))
+    assert out.verdicts[0].verdict == "partial" and calls["n"] == 1
+
+
+def test_model_repair_is_told_where_it_broke_and_failure_is_a_clean_error():
+    sent = []
+
+    def handler(req):
+        sent.append(json.loads(req.content))
+        return httpx.Response(200, json=chat_reply('{"verdicts": [{"id": "c1", "verdict": '))   # truncated
+
+    with pytest.raises(ModelOutputError, match="invalid JSON after repair"):
+        asyncio.run(make_gw(handler).chat_json("verify", [{"role": "user", "content": "x"}], VerifierOutput, ctx()))
+    assert len(sent) == 2                                                     # one model repair, no more
+    assert "breaks near character" in sent[1]["messages"][-1]["content"]
+
+
+def test_reply_split_into_two_objects_is_merged_without_a_model_call():
+    split = '{"status": "answered", "summary": "ملخص"}\n{"sections": {"rights": []}, "caveats": []}'
+    assert extract_json(split) == {"status": "answered", "summary": "ملخص", "sections": {"rights": []},
+                                   "caveats": []}
+
+
+def test_split_objects_with_overlapping_keys_are_not_guessed():
+    with pytest.raises(ValueError):
+        extract_json('{"summary": "أ"}\n{"summary": "ب"}')

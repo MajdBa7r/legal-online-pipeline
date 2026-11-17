@@ -13,7 +13,8 @@
             "article_id": "L1",
             "quote": "إجازة سنوية بأجر كامل مدتها أربعة عشر يوماً",
             "label": "قانون تجريبي للعمل، المادة 61"
-          }
+          },
+          "display_text": "يحق لـ خالد إجازة سنوية مدتها 14 يوماً (قانون تجريبي للعمل، المادة 61)"
         }
       ],
       "obligations": [],
@@ -22,7 +23,8 @@
     },
     "caveats": [],
     "partial": false,
-    "amendment_warning": false
+    "amendment_warning": false,
+    "verification": "verified"
   },
   "clarifying_question": null,
   "referral": null,

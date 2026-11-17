@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import httpx
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
@@ -54,6 +55,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Jordanian Legal AI Assistant API", lifespan=lifespan)
+
+
+def configure_cors(app_: FastAPI, origins: str) -> list[str]:
+    """Allow the website to call the API from another origin (CORS_ORIGINS). Empty = same origin only."""
+    allowed = [o.strip().rstrip("/") for o in origins.split(",") if o.strip()]
+    if allowed:
+        app_.add_middleware(CORSMiddleware, allow_origins=allowed, allow_methods=["GET", "POST"],
+                            allow_headers=["Content-Type", "Accept"], max_age=600)
+    return allowed
+
+
+configure_cors(app, settings.cors_origins)
 
 
 def _keep(app_: FastAPI, coro) -> None:

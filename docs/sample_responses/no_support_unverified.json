@@ -1,0 +1,23 @@
+{
+  "request_id": "c765370be6bd49bd",
+  "type": "no_support",
+  "domain": "labour",
+  "coverage": null,
+  "answer": null,
+  "clarifying_question": null,
+  "referral": null,
+  "message": "لم نتمكن من التحقق من إجابة كاملة لسؤالك في نص القانون، لذلك لا نعرض إجابة قد تكون ناقصة أو مضللة. ننصحك بإعادة صياغة السؤال، أو بمراجعة محامٍ أو الجهة المختصة.",
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "retrieve": 0,
+    "generate": 0,
+    "verify": 0,
+    "total": 0
+  },
+  "_note": "Abstention: an essential claim could not be verified, so no answer is shown (type no_support, UNVERIFIED message)."
+}

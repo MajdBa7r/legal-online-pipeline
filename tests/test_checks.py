@@ -76,3 +76,16 @@ def test_ordinal_age_supports_a_digit_claim():
 
 def test_existing_word_numbers_unchanged():
     assert _x("أربعة عشر يوماً") == {14.0} and _x("خمسة وعشرين بالمئة") == {25.0} and _x("الأول") == set()
+
+
+# ---- source-text defect: dual glued to the previous word (Labour Law Art. 61) ---------------------------
+def test_dual_glued_to_previous_word_in_the_article_supports_the_claim():
+    article = "وفي حال رفض منحه الإجازة وانقضتالسنتان يعاقب بغرامة مقدارها مائة دينار"
+    assert _ns("وإذا رفض منحك إجازتك وانقضت سنتان فعليه غرامة مقدارها مائة دينار", article) == (True, [])
+
+
+def test_glued_fallback_is_narrow():
+    article = "وفي حال رفض منحه الإجازة وانقضتالسنتان يعاقب بغرامة"
+    assert _ns("وانقضت ثلاث سنوات", article) == (False, [3.0])          # other numbers still need support
+    assert 2.0 not in _x("وانقضتالسنتان")                                   # claims never use the fallback
+    assert _ns("خلال يومين", "خلال اليومين التاليين") == (True, [])          # normal duals work as before

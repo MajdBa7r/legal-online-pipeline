@@ -58,7 +58,7 @@ class GeneratedAnswer(BaseModel):
         return [(name, c) for name in SECTION_NAMES for c in getattr(self.sections, name)]
 
     def ensure_unique_ids(self) -> None:
-        seen: set[str] = set()
+        seen: set[str] = {"summary"}     # reserved for the summary item in the checker request
         n = 0
         for _, c in self.claims():
             n += 1

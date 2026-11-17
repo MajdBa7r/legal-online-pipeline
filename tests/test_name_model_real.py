@@ -77,3 +77,34 @@ def test_name_fully_masked_anywhere_in_long_natural_text(model, where, punctuate
     assert len(model.windows(text)) > 1
     r = PIIMasker(name_model=model).mask(text)
     assert "غيث" not in r.text and "القيسي" not in r.text, r.mapping
+
+
+# ---- regression cases for the hybrid (real model): where the rules fail, and where the model may over-mask ----
+# These record the REAL model's behaviour on fixed synthetic sentences. A failure here is a finding to report,
+# not something to fix by changing the expectation or tuning a threshold.
+RULES_MISS = [   # names with no trigger word and not in common_names.txt: the rules leave them visible
+    ("حكيت مع غيث القيسي من الموارد البشرية وما رد علي", "غيث القيسي"),
+    ("المالك ضحى النعيمات رافضة ترجعلي التأمين", "ضحى النعيمات"),
+    ("بعتت الأوراق لبراء الفلاحات بالقسم القانوني", "الفلاحات"),
+]
+MUST_STAY_VISIBLE = [  # no personal data: nothing here may be masked
+    "المالك بدو يطلعني من الشقة قبل ما يخلص العقد",
+    "صاحب العمل كان كريم معي بس ما دفع بدل الإجازة",
+    "قدمت شكوى لوزارة العمل في اربد وما حد رد علي",
+    "المؤسسة العامة للضمان الاجتماعي رفضت طلب التقاعد المبكر",
+    "حسب قانون العمل الأردني بستحق أربعة عشر يوم إجازة",
+    "زوجتي حامل وبدها تعرف قديش إجازة الأمومة",
+]
+
+
+@pytest.mark.parametrize("text,name", RULES_MISS)
+def test_rules_miss_but_hybrid_masks(model, text, name):
+    assert name in PIIMasker().mask(text).text                     # baseline: the rules really miss it
+    r = PIIMasker(name_model=model).mask(text)
+    assert name not in r.text, f"hybrid left the name visible: {r.text}"
+
+
+@pytest.mark.parametrize("text", MUST_STAY_VISIBLE)
+def test_hybrid_does_not_mask_ordinary_or_legal_text(model, text):
+    r = PIIMasker(name_model=model).mask(text)
+    assert r.mapping == {}, f"false positive: {r.mapping}"

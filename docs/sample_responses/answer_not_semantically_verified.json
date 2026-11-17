@@ -1,0 +1,47 @@
+{
+  "request_id": "ae2b252bf1f24bdf",
+  "type": "answer",
+  "domain": "labour",
+  "coverage": "initial",
+  "answer": {
+    "summary": "فيما يلي ما تنص عليه المواد القانونية ذات الصلة بسؤالك.",
+    "sections": {
+      "rights": [
+        {
+          "text": "يحق لـ خالد إجازة سنوية مدتها 14 يوماً",
+          "citation": {
+            "article_id": "L1",
+            "quote": "إجازة سنوية بأجر كامل مدتها أربعة عشر يوماً",
+            "label": "قانون تجريبي للعمل، المادة 61"
+          },
+          "display_text": "يحق لـ خالد إجازة سنوية مدتها 14 يوماً (قانون تجريبي للعمل، المادة 61)"
+        }
+      ],
+      "obligations": [],
+      "steps": [],
+      "conditions": []
+    },
+    "caveats": [
+      "لم يكتمل التحقق من معنى هذه الإجابة: تحققنا آلياً فقط من أن كل معلومة مستندة إلى مادة قانونية حقيقية وأن الاقتباس مطابق لنصها. يُنصح بقراءة نص المادة كاملاً."
+    ],
+    "partial": false,
+    "amendment_warning": false,
+    "verification": "not_semantically_verified"
+  },
+  "clarifying_question": null,
+  "referral": null,
+  "message": null,
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "retrieve": 0,
+    "generate": 0,
+    "verify": 0,
+    "total": 1
+  },
+  "_note": "Checker could not run: claims passed the code checks only; summary replaced; verification=not_semantically_verified. Show a visible badge."
+}

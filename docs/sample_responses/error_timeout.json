@@ -1,0 +1,22 @@
+{
+  "request_id": "233d3fb73383494d",
+  "type": "error",
+  "domain": "labour",
+  "coverage": null,
+  "answer": null,
+  "clarifying_question": null,
+  "referral": null,
+  "message": "استغرق تجهيز الإجابة وقتاً أطول من المتوقع. حاول مرة أخرى، أو صغ السؤال بشكل أقصر.",
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "retrieve": 0,
+    "generate": 0,
+    "total": 0
+  },
+  "_note": "Writing step timed out."
+}

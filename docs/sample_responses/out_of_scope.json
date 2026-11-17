@@ -1,0 +1,20 @@
+{
+  "request_id": "fbe102fc59fe4df0",
+  "type": "out_of_scope",
+  "domain": null,
+  "coverage": null,
+  "answer": null,
+  "clarifying_question": null,
+  "referral": null,
+  "message": "هذه الخدمة تجيب عن الأسئلة المتعلقة بالتشريعات الأردنية فقط. يمكنك طرح سؤال قانوني.",
+  "data_version": {
+    "version": "test-1",
+    "scraped_at": "2026-10-13"
+  },
+  "timings_ms": {
+    "mask": 0,
+    "understand": 0,
+    "total": 0
+  },
+  "_note": "Not a legal question."
+}

@@ -69,6 +69,8 @@ class Settings:
     prompts_dir: str = str(APP_DIR / "prompts")
 
     # Ops
+    cors_origins: str = ""          # comma-separated website origins allowed to call the API from a browser,
+                                    # e.g. "https://legal-web.example.com"; empty = same origin only
     eval_token: str = ""            # X-Eval-Token value that allows storing test-question text in traces
     demo_cache: bool = False        # cache full responses (demo warm-up)
     resource_refresh_s: int = 300   # how often to check data_versions for a new load
