@@ -9,6 +9,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -17,7 +18,7 @@ from app.context import Deadline, RequestCtx
 from app.db.factory import make_store
 from app.gateway.client import ModelGateway
 from app.orchestrator import Pipeline
-from app.pii.masker import PIIMasker
+from app.pii.factory import PIIStatus, build_masker
 from app.resources import Resources
 from app.schemas.api import ArticleOut, AskRequest, AskResponse, DataVersionOut, HealthOut
 
@@ -43,8 +44,10 @@ async def lifespan(app: FastAPI):
         await res.load(store)
     except Exception as e:  # start anyway; /api/health reports degraded
         log.error("initial resource load failed: %s", e)
-    app.state.pipeline = Pipeline(gw, store, res, PIIMasker(), settings)
+    masker, pii_status = build_masker(settings)
+    app.state.pipeline = Pipeline(gw, store, res, masker, settings)
     app.state.store, app.state.gw, app.state.res = store, gw, res
+    app.state.pii_status = pii_status
     app.state.bg_tasks = set()
     yield
     await http.aclose()
@@ -70,8 +73,18 @@ def _trace_row(ctx: RequestCtx, req: AskRequest, resp: AskResponse, request: Req
     return row
 
 
+PII_BLOCKED_MESSAGE = ("الخدمة غير متاحة مؤقتاً لأسباب تتعلق بحماية البيانات الشخصية. "
+                       "The service is temporarily unavailable: personal-data protection is not ready.")
+
+
 @app.post("/api/ask", response_model=AskResponse)
 async def ask(req: AskRequest, request: Request):
+    pii: PIIStatus = request.app.state.pii_status
+    if not pii.serving:  # production + configured name model unavailable: fail closed
+        log.error("/api/ask refused (503): PII name model %s unavailable", pii.configured)
+        return JSONResponse(status_code=503, content={"detail": PII_BLOCKED_MESSAGE, "pii_name_model": pii.label()})
+    if pii.degraded:
+        log.warning("PII NAME MODEL %s UNAVAILABLE: this request is masked with rules only", pii.configured)
     pipeline: Pipeline = request.app.state.pipeline
     wants_stream = "text/event-stream" in request.headers.get("accept", "")
 
@@ -125,8 +138,10 @@ async def health(request: Request):
     models = dict(request.app.state.gw.status)
     dv = res.data_version
     loaded = bool(res.packs) and any(res.packs.values())
-    ok = db_ok and loaded and not any(v == "error" for v in models.values())
-    return HealthOut(status="ok" if ok else "degraded", database=db_ok, models=models,
+    pii: PIIStatus = request.app.state.pii_status
+    ok = db_ok and loaded and not any(v == "error" for v in models.values()) and not pii.degraded
+    status = "unavailable" if not pii.serving else ("ok" if ok else "degraded")
+    return HealthOut(status=status, database=db_ok, models=models, pii_name_model=pii.label(),
                      data_version=DataVersionOut(version=dv.version if dv else None,
                                                  scraped_at=dv.scraped_at if dv else None))
 

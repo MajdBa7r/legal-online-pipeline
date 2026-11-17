@@ -1,0 +1,8 @@
+# OPTIONAL: only needed for PII_NAME_MODEL=camelbert-da (the default PII_NAME_MODEL=none needs none of this).
+# Install CPU-only PyTorch FIRST from the PyTorch index (much smaller than the default GPU build):
+#     pip install torch --index-url https://download.pytorch.org/whl/cpu
+# then:
+#     pip install -r requirements-ml.txt
+torch>=2.3
+transformers>=4.44
+psutil>=5.9        # memory reading in scripts/download_name_model.py

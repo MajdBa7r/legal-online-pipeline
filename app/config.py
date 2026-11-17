@@ -21,6 +21,16 @@ def _cast(value: str, typ):
 
 @dataclass(frozen=True)
 class Settings:
+    # Environment: "development" or "production" (decides the PII failure policy)
+    app_env: str = "development"
+
+    # PII masking: optional name model on top of the rules (default: rules only)
+    pii_name_model: str = "none"                  # none | camelbert-da
+    pii_name_model_id: str = "CAMeL-Lab/bert-base-arabic-camelbert-da-ner"
+    pii_name_model_min_score: float = 0.0         # tuned on the development set only (Phase 3D)
+    pii_name_model_revision: str = ""             # optional Hugging Face commit hash to pin the model files
+    pii_family_name_expansion: bool = False       # experimental, OFF until accepted in Phase 3D (on/off)
+
     # Storage backend: "local" (scraped JSON files, development) or "supabase" (Data team's database)
     store_backend: str = "local"
     local_data_dir: str = str(PROJECT_DIR / "data" / "dev")

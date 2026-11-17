@@ -1,0 +1,48 @@
+# Words that are NEVER a person's name in our questions: legal parties, work roles, family words.
+# Used ONLY on name-model spans and by family-name expansion; the rule-based masker does not read this file.
+# A listed word is trimmed from the EDGES of a model name span ("المالك سند" -> "سند"); it never removes a
+# name next to it. Matching uses normalized Arabic (alef/ta-marbuta/ya forms) and strips attached و ف ب ل ك.
+#
+# Rules (enforced by tests/test_name_exclusions.py):
+#   * at most 40 entries, each "word | category", category one of: legal_party, work_role, family
+#   * no entry (or its form without ال) may appear in app/pii/common_names.txt or any evaluation name pool
+#   * add a word only because it is non-personal, never because it improves a benchmark number
+#
+# legal parties
+المالك | legal_party
+المؤجر | legal_party
+المستأجر | legal_party
+المستأجرة | legal_party
+المدعي | legal_party
+الكفيل | legal_party
+الوكيل | legal_party
+المحامي | legal_party
+القاضي | legal_party
+الشاهد | legal_party
+الورثة | legal_party
+# work roles
+المدير | work_role
+مديري | work_role
+الموظف | work_role
+الموظفة | work_role
+العامل | work_role
+العاملة | work_role
+المحاسب | work_role
+المشرف | work_role
+صاحب | work_role
+المقاول | work_role
+التاجر | work_role
+البائع | work_role
+المشتري | work_role
+# family words
+زوجي | family
+زوجتي | family
+جوزي | family
+ابني | family
+بنتي | family
+أخوي | family
+أختي | family
+أبوي | family
+أمي | family
+الزوج | family
+الزوجة | family

@@ -9,6 +9,9 @@ What is measured (characters, not tokens, so rules and models are comparable):
   extra types are outside the current masking scope.
 * FALSE ALARM: a detected span that overlaps no gold value. Reported overall and as the share of
   negative (no-PII) sentences with at least one false alarm.
+* ROLE-WORD FALSE ALARM: a word from app/pii/name_exclusions.txt (المالك, المستأجر, زوجتي ...) that a detected
+  span covers although it is not part of any gold value. Hiding these strips the parties from the question.
+* SUB-WORD SPAN: a detected span that starts or ends inside a word (e.g. "ايم" of "ايميل").
 """
 from __future__ import annotations
 
@@ -20,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 from app.pii.detectors import CORE_TYPES, EXTRA_TYPES, Span
+from app.pii.name_postprocess import is_excluded, is_subword_span, word_spans
 
 
 @dataclass
@@ -77,6 +81,7 @@ def _covered(text: str, g: Gold, spans: list[Span]) -> tuple[float, set[str]]:
 
 def evaluate(detector, cases: list[Case]) -> dict[str, Any]:
     gold_rows, fp_rows, sentence_rows, times = [], [], [], []
+    role_rows, subword_rows = [], []
     for c in cases:
         t0 = time.perf_counter()
         spans = detector.detect(c.text)
@@ -88,6 +93,13 @@ def evaluate(detector, cases: list[Case]) -> dict[str, Any]:
                               "coverage": round(cov, 3), "status": status, "detected_types": sorted(types),
                               "text": c.text})
         for s in spans:
+            if is_subword_span(c.text, s.start, s.end):
+                subword_rows.append({"case": c.id, "type": s.type, "span": c.text[s.start:s.end], "text": c.text})
+            for ws, we in word_spans(c.text, s.start, s.end):
+                word = c.text[ws:we]
+                if is_excluded(word) and not any(ws < g.end and g.start < we for g in c.gold):
+                    role_rows.append({"case": c.id, "type": s.type, "word": word,
+                                      "span": c.text[s.start:s.end], "text": c.text})
             if not any(s.start < g.end and g.start < s.end for g in c.gold):
                 fp_rows.append({"case": c.id, "group": c.group, "type": s.type, "span": c.text[s.start:s.end],
                                 "tags": c.tags, "text": c.text})
@@ -98,7 +110,8 @@ def evaluate(detector, cases: list[Case]) -> dict[str, Any]:
                               "extra_leak": any(r["status"] != "full" for r in extra) if extra else None,
                               "false_alarm": any(f["case"] == c.id for f in fp_rows)})
     return {"detector": getattr(detector, "name", type(detector).__name__), "gold": gold_rows,
-            "false_alarms": fp_rows, "sentences": sentence_rows, "seconds": times}
+            "false_alarms": fp_rows, "sentences": sentence_rows, "seconds": times,
+            "role_word_false_alarms": role_rows, "subword_spans": subword_rows}
 
 
 def _rate(rows, key):
@@ -152,6 +165,8 @@ def summarize(result: dict[str, Any]) -> dict[str, Any]:
                                     for t in {f["type"] for f in result["false_alarms"]}}.items())),
         },
         "type_confusions": len(type_confusions),
+        "role_word_false_alarms": len(result.get("role_word_false_alarms", [])),
+        "subword_spans": len(result.get("subword_spans", [])),
         "latency_ms": {"median": 1000 * secs[len(secs) // 2] if secs else 0.0,
                        "p95": 1000 * secs[int(len(secs) * 0.95) - 1] if secs else 0.0},
         "gold_detected_any": n_pred_true,
@@ -187,6 +202,8 @@ def format_report(summary: dict[str, Any]) -> str:
               f"{fa['negative_sentences']} ({fa['rate']:.0%})",
               f"  false-alarm spans in all sentences: {fa['total_false_alarm_spans']}  by type: {fa['by_type']}",
               f"  values detected but with a different type: {s['type_confusions']}",
+              f"  role/family words hidden (role-word false alarms): {s.get('role_word_false_alarms', 0)}",
+              f"  spans cutting a word (sub-word spans): {s.get('subword_spans', 0)}",
               "", f"LATENCY per sentence: median {s['latency_ms']['median']:.2f} ms, "
                   f"p95 {s['latency_ms']['p95']:.2f} ms"]
     return "\n".join(lines)

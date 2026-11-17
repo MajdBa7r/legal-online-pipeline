@@ -15,7 +15,7 @@ question -> 1 mask PII -> 2 understand -> 3 gate -> 4a domain pack | 4b search +
 ```bash
 pip install -r requirements.txt
 cp .env.example .env            # locally; on Replit put these in Secrets
-pytest                          # 68 tests (64 + 4 that need data/dev/), no keys or network needed
+pytest                          # 94 tests (90 + 4 that need data/dev/), no keys or network needed
 python scripts/check_models.py  # Day 1: every model role answers, with latency
 python scripts/check_supabase.py  # Day 1: DB latency, data version, pack sizes, hybrid_search
 uvicorn app.main:app --reload --port 8000
@@ -56,7 +56,29 @@ separately; not in the masking scope), and 50 with no personal data.
 - `notebooks/pii_benchmark.ipynb` (Google Colab, GPU): the same harness on Arabic NER models and rules+model
   hybrids. Only the synthetic sentences go to Colab.
 
-The harness uses `app/pii/detectors.py`; the pipeline still masks with `app/pii/masker.py`, unchanged.
+The harness uses `app/pii/detectors.py`; the pipeline masks with `app/pii/masker.py`.
+
+**Optional name model (Step 3, in progress).** `PII_NAME_MODEL=none` (default) is rules only and is proven identical
+to the original masker by `tests/test_masker_golden.py` (1,663 recorded outputs). `PII_NAME_MODEL=camelbert-da`
+adds CAMeLBERT-da on CPU (`app/pii/name_model.py`): person spans only, run sentence by sentence (at most 128
+pieces per call; long unpunctuated text in 128-piece windows with 32 overlapping),
+then whole-word expansion, invalid-span filtering and trimming of role/family words
+(`app/pii/name_exclusions.txt`, at most 40 categorized words, checked against `common_names.txt` and the evaluation
+name pools). If it cannot load: `APP_ENV=development` falls back to rules with a loud warning;
+`APP_ENV=production` keeps the server up but answers `/api/ask` with HTTP 503. `/api/health` reports
+`pii_name_model`. `PII_FAMILY_NAME_EXPANSION` (off) is an experimental option evaluated in Phase 3D.
+Held-out PII data is never used for tuning.
+
+Running the real model locally (optional, not needed for the default setup):
+
+    pip install torch --index-url https://download.pytorch.org/whl/cpu
+    pip install -r requirements-ml.txt
+    python scripts/download_name_model.py                       # download + smoke check
+    PII_REAL_MODEL=1 python -m pytest tests/test_name_model_real.py -v
+    python scripts/eval_pii.py --configs all --save              # development set, four configurations
+
+Tests that use a fake model (`test_name_model_camelbert.py`) or a tiny random local model
+(`test_name_model_hf_plumbing.py`) check our code only; they say nothing about the real model's accuracy.
 
 Streaming progress for the website: send `Accept: text/event-stream` to `/api/ask`. You get `stage` events
 (`understanding`, `searching`, `writing`, `checking`) and then one `result` event with the final JSON.

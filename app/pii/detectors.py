@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing import Any, Callable, Iterable
 
 from app.pii import masker as M
-from app.text.arabic import to_latin_digits
 
 CORE_TYPES = ("name", "phone", "national_id", "iban", "email")
 EXTRA_TYPES = ("address", "plate")
@@ -31,20 +30,29 @@ class Span:
 
 
 class RuleDetector:
-    """The production rules, unchanged: same patterns, same name logic, same overlap resolution as mask()."""
+    """The production rules alone: exactly the spans of PIIMasker.mask() with no name model."""
 
     name = "rules"
 
     def __init__(self, masker: M.PIIMasker | None = None):
         self.masker = masker or M.PIIMasker()
+        if self.masker.name_model is not None:
+            raise ValueError("RuleDetector is rules only; use MaskerDetector for a masker with a name model")
 
     def detect(self, text: str) -> list[Span]:
-        probe = to_latin_digits(text)
-        spans: list[tuple[int, int, str]] = []
-        for kind, pattern in M.PATTERNS:
-            spans.extend((m.start(), m.end(), kind) for m in pattern.finditer(probe))
-        spans.extend(self.masker._name_spans(text))
-        return [Span(s, e, t, "rules") for s, e, t in self.masker._drop_overlaps(spans)]
+        return [Span(s, e, t, "rules") for s, e, t in self.masker.spans(text)]
+
+
+class MaskerDetector:
+    """Exactly what a configured PIIMasker.mask() replaces (rules + optional name model): the production path."""
+
+    def __init__(self, masker: M.PIIMasker, name: str | None = None):
+        self.masker = masker
+        model = getattr(masker.name_model, "name", None)
+        self.name = name or (f"masker[rules+{model}]" if model else "masker[rules]")
+
+    def detect(self, text: str) -> list[Span]:
+        return [Span(s, e, t, "masker") for s, e, t in self.masker.spans(text)]
 
 
 def _locate(text: str, value: str) -> Iterable[tuple[int, int]]:

@@ -87,7 +87,8 @@ class ArticleOut(BaseModel):
 
 
 class HealthOut(BaseModel):
-    status: Literal["ok", "degraded"]
+    status: Literal["ok", "degraded", "unavailable"]
     database: bool
     models: dict[str, str]
     data_version: DataVersionOut
+    pii_name_model: str = "none"  # added in Phase 3A (additive): "none", a model name, or why it is unavailable
