@@ -36,6 +36,9 @@ class Claim(BaseModel):
     text: str
     article_id: str
     quote: str
+    # True when the direct answer depends on this claim (the main rule, or a condition/exception that changes the
+    # outcome for this user). Missing -> True: an unmarked claim is never assumed safe to drop.
+    essential: bool = True
 
 
 class Sections(BaseModel):

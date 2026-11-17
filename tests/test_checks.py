@@ -52,3 +52,27 @@ def test_fts_query_is_or_joined_without_stopwords():
     assert " or " in q
     assert "هل" not in q.split(" or ")
     assert normalize("إنهاء") in q
+
+
+# ---- ordinal numbers written as words (MVP step 1 fix) --------------------------------------------------
+import pytest as _pytest  # noqa: E402
+
+from app.verify_checks.numbers import extract_numbers as _x, numbers_supported as _ns  # noqa: E402
+
+
+@_pytest.mark.parametrize("text,value", [
+    ("سن الخامسة والخمسين", 55), ("سن الخامسة والأربعين", 45), ("الحادي عشر", 11),
+    ("السادسة عشرة", 16), ("الثانية والستين", 62), ("العاشرة", 10),
+])
+def test_ordinal_words(text, value):
+    assert value in _x(text)
+
+
+def test_ordinal_age_supports_a_digit_claim():
+    article = "ان يكمل المؤمن عليه الذكر سن الخامسة والخمسين من عمره وان تبلغ اشتراكاته (252) اشتراكاً"
+    assert _ns("فيشترط للذكر إكمال 55 سنة وبلوغ 252 اشتراكا فعليا", article) == (True, [])
+    assert _ns("فيشترط للذكر إكمال 56 سنة", article) == (False, [56.0])     # a wrong age is still caught
+
+
+def test_existing_word_numbers_unchanged():
+    assert _x("أربعة عشر يوماً") == {14.0} and _x("خمسة وعشرين بالمئة") == {25.0} and _x("الأول") == set()

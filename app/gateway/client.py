@@ -53,6 +53,7 @@ class RoleConfig:
     max_tokens: int | None = None
     json_mode: bool = True
     dimensions: int | None = None
+    extra_body: dict[str, Any] | None = None   # provider-specific fields, e.g. {"reasoning_effort": "low"}
     fallback: "RoleConfig | None" = None
 
 
@@ -104,8 +105,20 @@ class ModelGateway:
             max_tokens=raw.get("max_tokens"),
             json_mode=bool(raw.get("json_mode", True)),
             dimensions=raw.get("dimensions"),
+            extra_body=self._extra_body(name, raw.get("extra_body")),
             fallback=fallback,
         )
+
+    @staticmethod
+    def _extra_body(role: str, extra: Any) -> dict[str, Any] | None:
+        if extra is None:
+            return None
+        if not isinstance(extra, dict):
+            raise RuntimeError(f"models.yaml: role {role}: extra_body must be a mapping")
+        reserved = {"model", "messages", "temperature", "max_tokens", "response_format", "input"} & set(extra)
+        if reserved:
+            raise RuntimeError(f"models.yaml: role {role}: extra_body may not set {sorted(reserved)}")
+        return dict(extra)
 
     # ---- startup checks ----------------------------------------------------
     def validate(self) -> None:
@@ -205,6 +218,8 @@ class ModelGateway:
             body["max_tokens"] = cfg.max_tokens
         if cfg.json_mode:
             body["response_format"] = {"type": "json_object"}
+        if cfg.extra_body:
+            body.update(cfg.extra_body)
         data = await self._post(cfg, f"{prov['base_url']}/chat/completions", body, ctx)
         try:
             content = data["choices"][0]["message"]["content"]
@@ -225,7 +240,9 @@ class ModelGateway:
             t0 = time.monotonic()
             status = "ok" if attempt == 1 else "retry_ok"
             try:
-                resp = await self.http.post(url, json=body, headers=headers, timeout=timeout)
+                # httpx timeouts apply per phase (connect / each read); wait_for caps the whole call
+                resp = await asyncio.wait_for(self.http.post(url, json=body, headers=headers, timeout=timeout),
+                                              timeout=timeout)
                 latency = int((time.monotonic() - t0) * 1000)
                 if resp.status_code >= 400:
                     retryable = resp.status_code in RETRYABLE_STATUS
@@ -241,7 +258,7 @@ class ModelGateway:
                     usage.get("completion_tokens") or usage.get("output_tokens"),
                 ))
                 return data
-            except httpx.TimeoutException as e:
+            except (httpx.TimeoutException, asyncio.TimeoutError) as e:
                 ctx.trace.add_call(ModelCall(cfg.role, cfg.model, int((time.monotonic() - t0) * 1000), "timeout"))
                 raise ModelCallError(f"{cfg.role}: timeout after {timeout:.1f}s") from e
             except httpx.TransportError as e:

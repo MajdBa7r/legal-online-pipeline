@@ -1,7 +1,9 @@
 """Runs one request through the seven stages inside the time budget."""
 from __future__ import annotations
 
+import asyncio
 import logging
+import time
 
 from app import messages as M
 from app.cache import LRU
@@ -57,7 +59,13 @@ class Pipeline:
                 ctx.trace.set(outcome="cache_hit")
                 return self._restore(cached.model_copy(update={"request_id": ctx.request_id}), mask)
 
-            resp = await self._run(mask, req, ctx)
+            try:   # hard backstop: the whole request, retries and rewrite included, ends at the deadline
+                resp = await asyncio.wait_for(self._run(mask, req, ctx),
+                                              timeout=max(0.1, ctx.deadline.remaining()))
+            except asyncio.TimeoutError:
+                log.warning("request hit the %.0fs budget", self.s.budget_s)
+                ctx.trace.set(outcome="timeout", error="budget")
+                return self._simple(ctx, "error", M.TIMEOUT)
             if self.s.demo_cache and resp.type == "answer":
                 self.demo_cache.put(cache_key, resp)
             return self._restore(resp, mask)
@@ -109,25 +117,39 @@ class Pipeline:
         feedback: str | None = None
         previous: GeneratedAnswer | None = None
         decision: Decision | None = None
+        first: tuple[GeneratedAnswer, object] | None = None      # attempt 1 (answer, report), kept for a fallback
         for attempt in (1, 2):
             await ctx.emit("writing")
+            t0 = time.monotonic()
             try:
                 with ctx.trace.stage("generate"):
                     ans = await generate(q, u, articles, self.gw, self.res, ctx, feedback, previous)
             except (ModelCallError, ModelOutputError) as e:
                 log.warning("generation attempt %d failed: %s", attempt, e)
-                ctx.trace.set(generations=attempt, outcome="timeout")
-                return self._simple(ctx, "error", M.TIMEOUT, domain=gate.domain)
+                ctx.trace.set(generations=attempt)
+                if first is None:
+                    ctx.trace.set(outcome="timeout")
+                    return self._simple(ctx, "error", M.TIMEOUT, domain=gate.domain)
+                # the rewrite failed: decide on the first answer, with no further rewrite
+                decision = decide(first[0], first[1], u, 2, 0.0, float("inf"), articles)
+                ctx.trace.set(rewrite_failed=True)
+                break
+            gen_s = time.monotonic() - t0
 
             await ctx.emit("checking")
+            t1 = time.monotonic()
             with ctx.trace.stage("verify"):
-                report = await verify(ans, articles, self.gw, self.res, self.s, ctx)
-            decision = decide(ans, report, u, attempt, ctx.deadline.remaining(), self.s.retry_min_remaining_s,
-                              articles)
+                report = await verify(ans, articles, self.gw, self.res, self.s, ctx,
+                                      question=f"{q}\n{u.msa_rewrite}")
+            ver_s = time.monotonic() - t1
+            # a rewrite costs about another generate + verify: require that (with margin) to be left
+            retry_min = self.retry_needed_s(gen_s, ver_s)
+            decision = decide(ans, report, u, attempt, ctx.deadline.remaining(), retry_min, articles)
             ctx.trace.set(generations=attempt, verification=report.counts(),
-                          semantic_skipped=report.semantic_skipped)
+                          semantic_skipped=report.semantic_skipped, retry_min_s=round(retry_min, 1))
             if decision.kind != "retry":
                 break
+            first = (ans, report)
             feedback, previous = report.feedback(ans), ans
 
         assert decision is not None
@@ -135,6 +157,8 @@ class Pipeline:
                       cited_ids=[c.article_id for _, c in decision.answer.claims()] if decision.answer else [])
         if decision.kind == "no_support":
             return self._simple(ctx, "no_support", M.NO_SUPPORT, domain=gate.domain)
+        if decision.kind == "unverified":          # abstain rather than show an incomplete or misleading answer
+            return self._simple(ctx, "no_support", M.UNVERIFIED, domain=gate.domain)
         if decision.force_initial_label:
             coverage = "initial"
         answer = self._answer_out(decision, articles) if decision.answer else None
@@ -142,6 +166,11 @@ class Pipeline:
             return self._simple(ctx, "referral", None, domain=gate.domain, coverage=coverage,
                                 referral=Referral(reason=M.REFERRAL), answer=answer)
         return self._simple(ctx, "answer", None, domain=gate.domain, coverage=coverage, answer=answer)
+
+    def retry_needed_s(self, gen_s: float, ver_s: float) -> float:
+        """Seconds that must be left before a rewrite starts: this request's own generate + verify times with a
+        25% margin plus the gateway reserve, and never less than RETRY_MIN_REMAINING_S."""
+        return max(self.s.retry_min_remaining_s, 1.25 * (gen_s + ver_s) + self.s.reserve_s)
 
     # ---------------------------------------------------------------------
     def _answer_out(self, d: Decision, articles: list[Article]) -> AnswerOut:

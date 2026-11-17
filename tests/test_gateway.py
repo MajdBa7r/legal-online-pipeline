@@ -106,3 +106,53 @@ def test_embed_and_rerank_shapes():
     assert vecs[0] == [0, 0, 0, 0]
     hits = asyncio.run(gw.rerank("q", ["d0", "d1"], 2, ctx()))
     assert hits[0].index == 1
+
+
+def test_extra_body_is_sent_and_temperature_null_is_omitted():
+    import copy
+    cfg = copy.deepcopy(CONFIG)
+    cfg["roles"]["generate"].update({"temperature": None, "extra_body": {"reasoning_effort": "low"}})
+    seen = {}
+
+    def handler(req):
+        seen.update(json.loads(req.content))
+        return httpx.Response(200, json=chat_reply(json.dumps({"verdicts": []})))
+
+    gw = ModelGateway(cfg, httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+                      env={"A_KEY": "x", "B_KEY": "y", "E_KEY": "z", "R_KEY": "w"})
+    asyncio.run(gw.chat_json("generate", [{"role": "user", "content": "x"}], VerifierOutput, ctx()))
+    assert seen["reasoning_effort"] == "low" and "temperature" not in seen and seen["model"] == "m-b"
+
+
+@pytest.mark.parametrize("bad", [{"model": "other"}, {"messages": []}, {"response_format": None}, "low"])
+def test_extra_body_cannot_override_core_fields(bad):
+    import copy
+    cfg = copy.deepcopy(CONFIG)
+    cfg["roles"]["generate"]["extra_body"] = bad
+    with pytest.raises(RuntimeError):
+        ModelGateway(cfg, httpx.AsyncClient(), env={})
+
+
+def test_a_hanging_call_is_cut_at_its_timeout():
+    import copy
+    import time as _t
+    cfg = copy.deepcopy(CONFIG)
+    cfg["roles"]["verify"]["timeout_s"] = 0.5
+
+    async def handler(req):                      # server that never answers in time
+        await asyncio.sleep(5)
+        return httpx.Response(200, json=chat_reply("{}"))
+
+    gw = ModelGateway(cfg, httpx.AsyncClient(transport=httpx.MockTransport(handler)), min_call_s=0.1,
+                      reserve_s=0.0, env={"A_KEY": "x", "B_KEY": "y", "E_KEY": "z", "R_KEY": "w"})
+    start = _t.monotonic()
+    with pytest.raises(ModelCallError, match="timeout"):
+        asyncio.run(gw.chat_json("verify", [{"role": "user", "content": "x"}], VerifierOutput, ctx()))
+    assert _t.monotonic() - start < 1.5
+
+
+def test_no_call_starts_without_enough_budget():
+    gw = make_gw(lambda req: httpx.Response(200, json=chat_reply(json.dumps({"verdicts": []}))))
+    tight = RequestCtx(deadline=Deadline(1.0))   # 1.0 - reserve 1.5 < min_call 2.0
+    with pytest.raises(ModelCallError):
+        asyncio.run(gw.chat_json("verify", [{"role": "user", "content": "x"}], VerifierOutput, tight))

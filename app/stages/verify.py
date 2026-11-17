@@ -35,6 +35,8 @@ class ClaimCheck:
 class VerificationReport:
     checks: dict[str, ClaimCheck]
     semantic_skipped: bool = False
+    # answer-level problems as (part, message); part is "summary" or "caveat:<index>"
+    answer_failures: list[tuple[str, str]] = field(default_factory=list)
 
     def passed_ids(self) -> set[str]:
         return {cid for cid, c in self.checks.items() if c.passed}
@@ -43,10 +45,11 @@ class VerificationReport:
         return [c for c in self.checks.values() if not c.passed]
 
     def all_passed(self) -> bool:
-        return bool(self.checks) and not self.failed()
+        return bool(self.checks) and not self.failed() and not self.answer_failures
 
     def counts(self) -> dict[str, int]:
-        out: dict[str, int] = {"claims": len(self.checks), "passed": len(self.passed_ids())}
+        out: dict[str, int] = {"claims": len(self.checks), "passed": len(self.passed_ids()),
+                               "answer_failures": len(self.answer_failures)}
         for c in self.checks.values():
             for f in c.failures:
                 out[f] = out.get(f, 0) + 1
@@ -61,6 +64,7 @@ class VerificationReport:
             claim = by_id.get(chk.claim_id)
             text = claim.text if claim else ""
             lines.append(f"- {chk.claim_id} ({text[:120]}): {'; '.join(chk.reasons)}")
+        lines += [f"- {part}: {msg}" for part, msg in self.answer_failures]
         return "\n".join(lines)
 
 
@@ -100,8 +104,26 @@ def _semantic_messages(items: list[tuple[Claim, Article]], res: Resources) -> li
     ]
 
 
+def answer_level_checks(answer: GeneratedAnswer, supplied: dict[str, Article],
+                        question: str) -> list[tuple[str, str]]:
+    """Summary and caveats carry no claims of their own, but they may restate the user's facts next to the rules.
+    Every number in them must come from the user's question or from an article cited by a claim."""
+    cited = [supplied[c.article_id] for _, c in answer.claims() if c.article_id in supplied]
+    source = "\n".join([question] + [a.text for a in cited])
+    allowed: set[float] = set()
+    for a in cited:
+        allowed |= a.metadata_numbers()
+    failures = []
+    for part, text in [("summary", answer.summary)] + [(f"caveat:{i}", c) for i, c in enumerate(answer.caveats)]:
+        ok, missing = numbers_supported(text, source, allowed)
+        if not ok:
+            failures.append((part, "numbers in neither the question nor a cited article: "
+                             + ", ".join(f"{m:g}" for m in missing)))
+    return failures
+
+
 async def verify(answer: GeneratedAnswer, articles: list[Article], gw: ModelGateway, res: Resources,
-                 settings: Settings, ctx: RequestCtx) -> VerificationReport:
+                 settings: Settings, ctx: RequestCtx, question: str = "") -> VerificationReport:
     supplied = {a.id: a for a in articles}
     checks: dict[str, ClaimCheck] = {}
     to_semantic: list[tuple[Claim, Article]] = []
@@ -111,7 +133,7 @@ async def verify(answer: GeneratedAnswer, articles: list[Article], gw: ModelGate
         if not chk.failures:
             to_semantic.append((claim, supplied[claim.article_id]))
 
-    report = VerificationReport(checks)
+    report = VerificationReport(checks, answer_failures=answer_level_checks(answer, supplied, question))
     if not to_semantic:
         return report
     try:

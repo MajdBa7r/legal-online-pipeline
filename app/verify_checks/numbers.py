@@ -33,10 +33,18 @@ THOUSANDS = {"الف": 1000, "الفا": 1000, "الفان": 2000, "الفين":
 DUALS = {"يومين": 2, "يومان": 2, "شهرين": 2, "شهران": 2, "سنتين": 2, "سنتان": 2, "عامين": 2, "عامان": 2,
          "اسبوعين": 2, "اسبوعان": 2, "ساعتين": 2, "ساعتان": 2}
 FRACTIONS = {"نصف": 0.5, "ربع": 0.25, "ثلث": 1 / 3, "ثلثي": 2 / 3, "ثلثا": 2 / 3}
+# ordinals, used for ages and counts written as words: "سن الخامسة والخمسين" = 55, "الحادي عشر" = 11.
+# (the "ال" is removed by the prefix handling below; "اول/اولى" is left out: it is also an ordinary word)
+ORDINALS = {
+    "حادي": 1, "حاديه": 1, "ثاني": 2, "ثانيه": 2, "ثالث": 3, "ثالثه": 3, "رابع": 4, "رابعه": 4,
+    "خامس": 5, "خامسه": 5, "سادس": 6, "سادسه": 6, "سابع": 7, "سابعه": 7, "ثامن": 8, "ثامنه": 8,
+    "تاسع": 9, "تاسعه": 9, "عاشر": 10, "عاشره": 10,
+}
 
 # normalize() also maps ئ -> ي, so run every key through it once
-UNITS, TEN, TENS, HUNDREDS, THOUSANDS, DUALS, FRACTIONS = (
-    {normalize(k): v for k, v in t.items()} for t in (UNITS, TEN, TENS, HUNDREDS, THOUSANDS, DUALS, FRACTIONS)
+UNITS, TEN, TENS, HUNDREDS, THOUSANDS, DUALS, FRACTIONS, ORDINALS = (
+    {normalize(k): v for k, v in t.items()}
+    for t in (UNITS, TEN, TENS, HUNDREDS, THOUSANDS, DUALS, FRACTIONS, ORDINALS)
 )
 
 _PREFIXES = ("وبال", "وال", "بال", "لل", "ال", "و", "ب", "ل")
@@ -50,7 +58,8 @@ def _word_value(tok: str) -> tuple[str, float, str] | None:
     candidates = [("", tok)] + [(p, tok[len(p):]) for p in _PREFIXES if tok.startswith(p) and len(tok) > len(p) + 1]
     for prefix, t in candidates:
         for kind, table in (("unit", UNITS), ("ten", TEN), ("tens", TENS), ("hundred", HUNDREDS),
-                            ("thousand", THOUSANDS), ("dual", DUALS), ("fraction", FRACTIONS)):
+                            ("thousand", THOUSANDS), ("dual", DUALS), ("fraction", FRACTIONS),
+                            ("unit", ORDINALS)):
             if t in table:
                 return kind, table[t], prefix
     return None

@@ -122,3 +122,95 @@ def test_generation_failure_returns_timeout_message():
     p, *_ = make({"understand": [UNDERSTAND_LABOUR], "generate": [ModelCallError("timeout")]})
     resp, _ = run(p, AskRequest(question="كم يوم إجازة سنوية؟"))
     assert resp.type == "error" and resp.message
+
+
+# ---- MVP step 1: time budget, rewrite timing, safe abstention -----------------------------------------
+import asyncio as _asyncio  # noqa: E402
+
+from app import messages as M  # noqa: E402
+from fakes import Delay  # noqa: E402
+
+TWO_CLAIMS_BAD = {"status": "answered", "summary": "ملخص", "sections": {"rights": [
+    {"id": "c1", "text": "يحق لك إجازة سنوية مدتها 14 يوماً", "article_id": "L1",
+     "quote": "إجازة سنوية بأجر كامل مدتها أربعة عشر يوماً"},
+    {"id": "c2", "text": "الإجازة 30 يوماً", "article_id": "L1", "quote": "إجازة مدفوعة لمدة شهر"}]}}
+
+
+def run_with(pipeline, req, budget):
+    async def go():
+        await pipeline.res.load(pipeline.store)
+        ctx = RequestCtx(deadline=Deadline(budget))
+        return await pipeline.handle(req, ctx), ctx
+    return _asyncio.run(go())
+
+
+def test_budget_default_is_40_seconds():
+    assert Settings().budget_s == 40.0
+
+
+def test_rewrite_skipped_when_this_requests_timing_does_not_fit():
+    # generate takes 0.4 s, so a rewrite needs >= max(floor, 1.25 * 0.4 + reserve); with the floor at 0 and
+    # only ~1 s budget left the rewrite must be skipped and the essential failing claim -> safe abstention
+    s = Settings(retry_min_remaining_s=0.0, reserve_s=0.5, budget_s=1.2)
+    gw = FakeGateway({"understand": [UNDERSTAND_LABOUR], "generate": [Delay(0.4, TWO_CLAIMS_BAD), GOOD],
+                      "verify": [SUPPORTED, SUPPORTED]})
+    p = Pipeline(gw, FakeStore(), make_resources(s), PIIMasker(), s)
+    resp, ctx = run_with(p, AskRequest(question="كم يوم إجازة سنوية؟"), 1.2)
+    assert ctx.trace.fields["generations"] == 1                    # no rewrite started
+    assert resp.type == "no_support" and resp.message == M.UNVERIFIED
+    assert ctx.trace.fields["retry_min_s"] >= 1.0
+
+
+def test_rewrite_happens_when_time_remains():
+    p, gw, _ = make({"understand": [UNDERSTAND_LABOUR], "generate": [TWO_CLAIMS_BAD, GOOD],
+                     "verify": [SUPPORTED, SUPPORTED]})
+    resp, ctx = run(p, AskRequest(question="كم يوم إجازة سنوية؟"))
+    assert ctx.trace.fields["generations"] == 2 and resp.type == "answer"
+
+
+def test_failed_rewrite_falls_back_to_the_first_answer_safely():
+    one_optional_bad = {"status": "answered", "summary": "ملخص", "sections": {"rights": [
+        {"id": "c1", "text": "يحق لك إجازة سنوية مدتها 14 يوماً", "article_id": "L1",
+         "quote": "إجازة سنوية بأجر كامل مدتها أربعة عشر يوماً"},
+        {"id": "c2", "text": "معلومة إضافية", "article_id": "L1", "quote": "إجازة مدفوعة لمدة شهر",
+         "essential": False}]}}
+    p, *_ = make({"understand": [UNDERSTAND_LABOUR], "generate": [one_optional_bad, ModelCallError("timeout")],
+                  "verify": [SUPPORTED]})
+    resp, ctx = run(p, AskRequest(question="كم يوم إجازة سنوية؟"))
+    assert ctx.trace.fields.get("rewrite_failed") is True
+    assert resp.type == "answer" and resp.answer.partial                 # optional claim dropped, marked partial
+    assert [c.text for c in resp.answer.sections.rights] == ["يحق لك إجازة سنوية مدتها 14 يوماً"]
+
+
+def test_failed_rewrite_with_essential_failure_abstains():
+    p, *_ = make({"understand": [UNDERSTAND_LABOUR], "generate": [TWO_CLAIMS_BAD, ModelCallError("timeout")],
+                  "verify": [SUPPORTED]})
+    resp, _ = run(p, AskRequest(question="كم يوم إجازة سنوية؟"))
+    assert resp.type == "no_support" and resp.message == M.UNVERIFIED
+
+
+def test_whole_request_is_cut_at_the_budget():
+    s = Settings(budget_s=0.5)
+    gw = FakeGateway({"understand": [Delay(5.0, UNDERSTAND_LABOUR)]})   # a call that ignores its timeout
+    p = Pipeline(gw, FakeStore(), make_resources(s), PIIMasker(), s)
+    import time as _t
+    start = _t.monotonic()
+    resp, ctx = run_with(p, AskRequest(question="كم يوم إجازة سنوية؟"), 0.5)
+    assert _t.monotonic() - start < 1.5
+    assert resp.type == "error" and resp.message == M.TIMEOUT and ctx.trace.fields["outcome"] == "timeout"
+
+
+def test_summary_number_not_in_question_or_articles_is_never_shown():
+    bad_summary = {**GOOD, "summary": "لديك 999 يوماً من الإجازة"}
+    p, *_ = make({"understand": [UNDERSTAND_LABOUR], "generate": [bad_summary, bad_summary],
+                  "verify": [SUPPORTED, SUPPORTED]})
+    resp, ctx = run(p, AskRequest(question="كم يوم إجازة سنوية؟"))
+    assert ctx.trace.fields["generations"] == 2
+    assert resp.type == "answer" and "999" not in resp.answer.summary and resp.answer.summary == M.NEUTRAL_SUMMARY
+
+
+def test_summary_may_restate_numbers_from_the_question():
+    s_ok = {**GOOD, "summary": "عملت 18 سنة، والقانون يحدد مدة الإجازة كما يلي."}
+    p, *_ = make({"understand": [UNDERSTAND_LABOUR], "generate": [s_ok], "verify": [SUPPORTED]})
+    resp, ctx = run(p, AskRequest(question="اشتغلت 18 سنة، كم يوم إجازة إلي؟"))
+    assert ctx.trace.fields["generations"] == 1 and "18" in resp.answer.summary

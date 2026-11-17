@@ -4,6 +4,8 @@ The articles below are INVENTED fixtures for tests only; they are not real law t
 """
 from __future__ import annotations
 
+import asyncio
+
 from typing import Any, Callable
 
 from app.config import Settings
@@ -68,6 +70,13 @@ class FakeStore:
 Script = Callable[[list[dict], int], Any]
 
 
+class Delay:
+    """Scripted reply that takes `seconds` before returning `item` (or raising it, if it is an Exception)."""
+
+    def __init__(self, seconds: float, item: Any):
+        self.seconds, self.item = seconds, item
+
+
 class FakeGateway:
     """Each role returns the next scripted item: a pydantic object, a dict, or an Exception to raise."""
 
@@ -92,6 +101,11 @@ class FakeGateway:
     async def chat_json(self, role, messages, schema, ctx):
         self.calls.append((role, messages))
         self._guard([m["content"] for m in messages if m["role"] != "system"], ctx)
+        queue = self.scripts.get(role) or []
+        if queue and isinstance(queue[0], Delay):
+            d = queue.pop(0)
+            await asyncio.sleep(d.seconds)
+            queue.insert(0, d.item)
         item = self._next(role)
         return item if isinstance(item, schema) else schema.model_validate(item)
 

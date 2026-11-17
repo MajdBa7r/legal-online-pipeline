@@ -128,7 +128,11 @@ Sample responses for the website team are in `docs/sample_responses/`.
   and a second model from a **different provider** agrees it is supported (`ModelGateway.validate()` refuses
   to start otherwise).
 - At most two generations per question; a rewrite starts only if `RETRY_MIN_REMAINING_S` seconds are left.
-- 30-second budget: every model timeout is `min(role timeout, time left - reserve)`.
+- 40-second budget for the whole request (hard deadline, rewrite and retries included): every model timeout is
+  `min(role timeout, time left - reserve)`, each call is capped as a whole, and a rewrite starts only if
+  `1.25 x (this request's generate + verify time) + reserve` is left. A failed essential claim makes the answer
+  abstain (`no_support` with the UNVERIFIED message) instead of being dropped; non-essential failed claims are
+  dropped and the answer is marked partial.
 - Nothing personal is sent or logged: the gateway blocks any call whose user text still contains a masked
   value; traces store IDs, timings and counts only.
 

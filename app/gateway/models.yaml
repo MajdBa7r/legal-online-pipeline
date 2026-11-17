@@ -26,6 +26,8 @@ providers:
     api_key_env: COHERE_API_KEY
 
 roles:
+  # LOCKED for the MVP on 2026-11-17 (scripts/compare_writers.py, logs reviewed): DeepSeek writes, Kimi checks.
+  # Thinking is OFF everywhere: with it on, DeepSeek V4 returned empty content or timed out, Kimi was too slow.
   understand:
     provider: deepseek
     model: deepseek-flash             # confirmed via /models on 2026-11-17
@@ -33,22 +35,25 @@ roles:
     max_tokens: 800
     timeout_s: 6
     json_mode: true
-    fallback: null                    # e.g. {provider: ..., model: ...}
+    extra_body: {thinking: {type: disabled}}
+    fallback: null
   generate:
-    provider: moonshot
-    model: kimi-k2.5                  # CHECK exact id
-    temperature: 0.1
-    max_tokens: 2000
-    timeout_s: 14
+    provider: deepseek
+    model: deepseek-flash             # 4/4 + 4/4 answers, 4.6-15.6 s with whole-law packs
+    temperature: 0.2                  # lower than the 0.6 compared, for more consistent answers
+    max_tokens: 3000                  # room for up to 8 claims with quotes
+    timeout_s: 20
     json_mode: true
+    extra_body: {thinking: {type: disabled}}
     fallback: null                    # must NOT be the verify provider
   verify:
-    provider: deepseek
-    model: deepseek-flash         # CHECK exact id
-    temperature: 0
-    max_tokens: 1000
-    timeout_s: 6
+    provider: moonshot
+    model: kimi-k2.6                  # confirmed via /models on 2026-11-17; 6.6 s for 5 claims
+    temperature: null                 # kimi-k2.6 fixes temperature (0.6 with thinking off); do not send it
+    max_tokens: 1500
+    timeout_s: 12
     json_mode: true
+    extra_body: {thinking: {type: disabled}}
     fallback: null
   embed:
     provider: openai
@@ -57,5 +62,5 @@ roles:
     timeout_s: 3
   rerank:
     provider: cohere
-    model: rerank-v3.5                # CHECK latest multilingual rerank id
+    model: rerank-v3.5                # CHECK latest multilingual rerank id (not used in the MVP: no key)
     timeout_s: 3

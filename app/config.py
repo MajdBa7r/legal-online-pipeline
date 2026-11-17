@@ -43,10 +43,11 @@ class Settings:
     supabase_service_key: str = ""
 
     # Time budget (seconds)
-    budget_s: float = 30.0
+    budget_s: float = 40.0          # whole request, rewrite and retries included (hard deadline)
     reserve_s: float = 1.5          # kept back from every model timeout
     min_call_s: float = 2.0         # no model call starts with less than this left
-    retry_min_remaining_s: float = 12.0  # a rewrite needs at least this much left
+    retry_min_remaining_s: float = 15.0  # floor; the orchestrator also requires 1.25 x this request's
+                                         # generate + verify time + reserve before a rewrite
 
     # Retrieval (stage 4b) - tune on the test set
     match_count: int = 30           # hybrid_search results per wording
